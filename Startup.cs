@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using SPRA_SchJob.Models;
 using SPRA_SchJob.Services;
 using SPRA_SchJob.UnitOfWork;
@@ -29,7 +30,7 @@ namespace SPRA_SchJob
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
             {
@@ -41,7 +42,8 @@ namespace SPRA_SchJob
                 app.UseHsts();
             }
 
-           
+            loggerFactory.AddLog4Net();
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 

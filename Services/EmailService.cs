@@ -1,4 +1,6 @@
-﻿using SPRA_SchJob.Models;
+﻿
+using SPRA_SchJob.Log;
+using SPRA_SchJob.Models;
 using SPRA_SchJob.UnitOfWork;
 using System;
 using System.Collections.Generic;
@@ -16,8 +18,10 @@ namespace SPRA_SchJob.Services
         }
         public List<EmailRecord> TriggerSendEmail()
         {
-            var query = from email in __misunitofwork.GetRepository<EmailRecord>().GetEntity().Where(e => e.IsSent == "N")
-                        select email;
+            IQueryable<EmailRecord> query = null;
+
+            query = from email in __misunitofwork.GetRepository<EmailRecord>().GetEntity().Where(e => e.IsSent == "N")
+                    select email;
             return query.ToList();
         }
     }
