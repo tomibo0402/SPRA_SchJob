@@ -55,7 +55,7 @@ namespace SPRA_SchJob.UnitOfWork
             {
                 if (disposing)
                 {
-                    __context.Dispose();
+                    //__context.Dispose();
 
                     if (__transaction != null)
                         __transaction.Dispose();

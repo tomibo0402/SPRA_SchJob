@@ -24,6 +24,15 @@ namespace SPRA_SchJob.Models
         public virtual DbSet<SystemRole> SystemRoles { get; set; }
         public virtual DbSet<SystemRoleFunction> SystemRoleFunctions { get; set; }
         public virtual DbSet<SystemUserRole> SystemUserRoles { get; set; }
+        public virtual DbSet<SalesDocEmail> SalesDocEmails { get; set; }
+        public virtual DbSet<CodeTable> CodeTables { get; set; }
+        public virtual DbSet<ApeuLogDoc> ApeuLogDocs { get; set; }
+        public virtual DbSet<RegisterAdvertisement> RegisterAdvertisements { get; set; }
+        public virtual DbSet<RegisterPriceList> RegisterPriceLists { get; set; }
+        public virtual DbSet<RegisterSalesArrangement> RegisterSalesArrangements { get; set; }
+        public virtual DbSet<RegisterSalesBrochure> RegisterSalesBrochures { get; set; }
+        public virtual DbSet<RegisterShowFlat> RegisterShowFlats { get; set; }
+        public virtual DbSet<RegisterTransactionMaster> RegisterTransactionMasters { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -38,7 +47,7 @@ namespace SPRA_SchJob.Models
         {
             modelBuilder.HasAnnotation("Relational:Collation", "Latin1_General_CI_AI");
 
-            
+
             modelBuilder.Entity<EmailRecord>(entity =>
             {
                 entity.ToTable("email_record");
@@ -535,6 +544,1111 @@ namespace SPRA_SchJob.Models
                     .HasForeignKey(d => d.RoleId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_system_user_role_system_role");
+            });
+            modelBuilder.Entity<SalesDocEmail>(entity =>
+            {
+                entity.ToTable("sales_doc_email");
+
+                entity.Property(e => e.SalesDocEmailId).HasColumnName("sales_doc_email_id");
+
+                entity.Property(e => e.ActionId)
+                    .IsRequired()
+                    .HasMaxLength(18)
+                    .IsUnicode(false)
+                    .HasColumnName("action_id");
+
+                entity.Property(e => e.CreateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("create_date");
+
+                entity.Property(e => e.CreateUser).HasColumnName("create_user");
+
+                entity.Property(e => e.DocType)
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("doc_type");
+
+                entity.Property(e => e.EmailTemplateId).HasColumnName("email_template_id");
+
+                entity.Property(e => e.IsDeleted)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_deleted")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.SendToPost)
+                    .IsRequired()
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("send_to_post");
+
+                entity.Property(e => e.UpdateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("update_date");
+
+                entity.Property(e => e.UpdateUser).HasColumnName("update_user");
+            });
+            modelBuilder.Entity<CodeTable>(entity =>
+            {
+                entity.HasKey(e => e.CodeId)
+                    .HasName("PK__code_tab__9A4BCC0CA27A9094");
+
+                entity.ToTable("code_table");
+
+                entity.Property(e => e.CodeId).HasColumnName("code_id");
+
+                entity.Property(e => e.ActionId)
+                    .IsRequired()
+                    .HasMaxLength(18)
+                    .IsUnicode(false)
+                    .HasColumnName("action_id");
+
+                entity.Property(e => e.Code)
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("code");
+
+                entity.Property(e => e.CodeDescriptionEng)
+                    .IsRequired()
+                    .HasMaxLength(200)
+                    .IsUnicode(false)
+                    .HasColumnName("code_description_eng");
+
+                entity.Property(e => e.CodeMasterType)
+                    .IsRequired()
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("code_master_type");
+
+                entity.Property(e => e.CodeType)
+                    .IsRequired()
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("code_type");
+
+                entity.Property(e => e.CreateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("create_date");
+
+                entity.Property(e => e.CreateUser).HasColumnName("create_user");
+
+                entity.Property(e => e.GroupType)
+                    .IsRequired()
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("group_type");
+
+                entity.Property(e => e.IsDefault)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_default")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.IsDeleted)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_deleted")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.IsSystemUse)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_system_use")
+                    .HasDefaultValueSql("('Y')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.UpdateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("update_date");
+
+                entity.Property(e => e.UpdateUser).HasColumnName("update_user");
+            });
+
+
+            modelBuilder.Entity<RegisterAdvertisement>(entity =>
+            {
+                entity.ToTable("register_advertisement");
+
+                entity.Property(e => e.RegisterAdvertisementId).HasColumnName("register_advertisement_id");
+
+                entity.Property(e => e.ActionId)
+                    .IsRequired()
+                    .HasMaxLength(18)
+                    .IsUnicode(false)
+                    .HasColumnName("action_id");
+
+                entity.Property(e => e.AdName)
+                    .HasMaxLength(200)
+                    .HasColumnName("ad_name");
+
+                entity.Property(e => e.AdPublishByVendor)
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("ad_publish_by_vendor");
+
+                entity.Property(e => e.AdType)
+                    .HasMaxLength(10)
+                    .IsUnicode(false)
+                    .HasColumnName("ad_type");
+
+                entity.Property(e => e.AdvReviseFlag)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("adv_revise_flag")
+                    .HasDefaultValueSql("('F')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.AipoUserId).HasColumnName("aipo_user_id");
+
+                entity.Property(e => e.ApeuDocId).HasColumnName("apeu_doc_id");
+
+                entity.Property(e => e.ApprovalDateCipo)
+                    .HasColumnType("date")
+                    .HasColumnName("approval_date_cipo");
+
+                entity.Property(e => e.AssignedTo).HasColumnName("assigned_to");
+
+                entity.Property(e => e.CaseId).HasColumnName("case_id");
+
+                entity.Property(e => e.CheckDateAipo)
+                    .HasColumnType("date")
+                    .HasColumnName("check_date_aipo");
+
+                entity.Property(e => e.CheckDateIpo)
+                    .HasColumnType("date")
+                    .HasColumnName("check_date_ipo");
+
+                entity.Property(e => e.CipoUserId).HasColumnName("cipo_user_id");
+
+                entity.Property(e => e.CreateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("create_date");
+
+                entity.Property(e => e.CreateUser).HasColumnName("create_user");
+
+                entity.Property(e => e.DevelopmentNo)
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("development_no");
+
+                entity.Property(e => e.EndorsementDateSipo)
+                    .HasColumnType("date")
+                    .HasColumnName("endorsement_date_sipo");
+
+                entity.Property(e => e.IpoUserId).HasColumnName("ipo_user_id");
+
+                entity.Property(e => e.IsCompianceGuideline)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_compiance_guideline")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.IsCompianceOrdinance)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_compiance_ordinance")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.IsDeleted)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_deleted")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.PrintDate)
+                    .HasColumnType("date")
+                    .HasColumnName("print_date");
+
+                entity.Property(e => e.ReferralDateIcau)
+                    .HasColumnType("date")
+                    .HasColumnName("referral_date_icau");
+
+                entity.Property(e => e.Remarks)
+                    .HasMaxLength(300)
+                    .IsUnicode(false)
+                    .HasColumnName("remarks");
+
+                entity.Property(e => e.RemarksReturn)
+                    .HasMaxLength(300)
+                    .IsUnicode(false)
+                    .HasColumnName("remarks_return");
+
+                entity.Property(e => e.SbAvailableDate)
+                    .HasColumnType("date")
+                    .HasColumnName("sb_available_date");
+
+                entity.Property(e => e.SerialNo)
+                    .HasMaxLength(15)
+                    .IsUnicode(false)
+                    .HasColumnName("serial_no");
+
+                entity.Property(e => e.SipoUserId).HasColumnName("sipo_user_id");
+
+                entity.Property(e => e.UpdateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("update_date");
+
+                entity.Property(e => e.UpdateUser).HasColumnName("update_user");
+
+                entity.Property(e => e.UploadDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("upload_date");
+
+                entity.Property(e => e.UploadUser).HasColumnName("upload_user");
+            });
+
+            modelBuilder.Entity<RegisterPriceList>(entity =>
+            {
+                entity.ToTable("register_price_list");
+
+                entity.Property(e => e.RegisterPriceListId).HasColumnName("register_price_list_id");
+
+                entity.Property(e => e.ActionId)
+                    .IsRequired()
+                    .HasMaxLength(18)
+                    .IsUnicode(false)
+                    .HasColumnName("action_id");
+
+                entity.Property(e => e.Aipo1UserId).HasColumnName("aipo1_user_id");
+
+                entity.Property(e => e.Aipo2UserId).HasColumnName("aipo2_user_id");
+
+                entity.Property(e => e.ApeuDocId).HasColumnName("apeu_doc_id");
+
+                entity.Property(e => e.ApprovalDateCipo)
+                    .HasColumnType("date")
+                    .HasColumnName("approval_date_cipo");
+
+                entity.Property(e => e.AssignedTo).HasColumnName("assigned_to");
+
+                entity.Property(e => e.AvailableDateSrpe)
+                    .HasColumnType("date")
+                    .HasColumnName("available_date_srpe");
+
+                entity.Property(e => e.AvailableToPublic)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("available_to_public")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.CaseId).HasColumnName("case_id");
+
+                entity.Property(e => e.CheckDateAipo1)
+                    .HasColumnType("date")
+                    .HasColumnName("check_date_aipo1");
+
+                entity.Property(e => e.CheckDateAipo2)
+                    .HasColumnType("date")
+                    .HasColumnName("check_date_aipo2");
+
+                entity.Property(e => e.CheckDateIpo1)
+                    .HasColumnType("date")
+                    .HasColumnName("check_date_ipo1");
+
+                entity.Property(e => e.CipoUserId).HasColumnName("cipo_user_id");
+
+                entity.Property(e => e.CreateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("create_date");
+
+                entity.Property(e => e.CreateUser).HasColumnName("create_user");
+
+                entity.Property(e => e.DevelopmentNo)
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("development_no");
+
+                entity.Property(e => e.DocRefNo)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("doc_ref_no");
+
+                entity.Property(e => e.EndorsementDateSipo1)
+                    .HasColumnType("date")
+                    .HasColumnName("endorsement_date_sipo1");
+
+                entity.Property(e => e.EndorsementDateSipo2)
+                    .HasColumnType("date")
+                    .HasColumnName("endorsement_date_sipo2");
+
+                entity.Property(e => e.FirstDateSales)
+                    .HasColumnType("date")
+                    .HasColumnName("first_date_sales");
+
+                entity.Property(e => e.FirstPrintDate)
+                    .HasColumnType("date")
+                    .HasColumnName("first_print_date");
+
+                entity.Property(e => e.Ipo1UserId).HasColumnName("ipo1_user_id");
+
+                entity.Property(e => e.IsComplianceGuideline)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_compliance_guideline")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.IsComplianceOrdinance)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_compliance_ordinance")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.IsDeleted)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_deleted")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.IsOtherRevised)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_other_revised")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.IsRevised)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_revised")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.IsVettingRequired)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_vetting_required")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.PlType)
+                    .HasMaxLength(10)
+                    .IsUnicode(false)
+                    .HasColumnName("pl_type");
+
+                entity.Property(e => e.ReceivedDateSrpa)
+                    .HasColumnType("date")
+                    .HasColumnName("received_date_srpa");
+
+                entity.Property(e => e.ReceivedDateVendor)
+                    .HasColumnType("date")
+                    .HasColumnName("received_date_vendor");
+
+                entity.Property(e => e.ReferralDateIcau)
+                    .HasColumnType("date")
+                    .HasColumnName("referral_date_icau");
+
+                entity.Property(e => e.Remarks)
+                    .HasMaxLength(300)
+                    .IsUnicode(false)
+                    .HasColumnName("remarks");
+
+                entity.Property(e => e.RemarksReturn)
+                    .HasMaxLength(300)
+                    .IsUnicode(false)
+                    .HasColumnName("remarks_return");
+
+                entity.Property(e => e.SerialNo)
+                    .HasMaxLength(15)
+                    .IsUnicode(false)
+                    .HasColumnName("serial_no");
+
+                entity.Property(e => e.Sipo1UserId).HasColumnName("sipo1_user_id");
+
+                entity.Property(e => e.Sipo2UserId).HasColumnName("sipo2_user_id");
+
+                entity.Property(e => e.SiteInspectionBy).HasColumnName("site_inspection_by");
+
+                entity.Property(e => e.SiteInspectionDate)
+                    .HasColumnType("date")
+                    .HasColumnName("site_inspection_date");
+
+                entity.Property(e => e.Status)
+                    .IsRequired()
+                    .HasMaxLength(10)
+                    .IsUnicode(false)
+                    .HasColumnName("status")
+                    .HasDefaultValueSql("('I')");
+
+                entity.Property(e => e.UpdateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("update_date");
+
+                entity.Property(e => e.UpdateUser).HasColumnName("update_user");
+
+                entity.Property(e => e.UploadDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("upload_date");
+
+                entity.Property(e => e.UploadUser).HasColumnName("upload_user");
+            });
+
+            modelBuilder.Entity<RegisterSalesArrangement>(entity =>
+            {
+                entity.ToTable("register_sales_arrangement");
+
+                entity.Property(e => e.RegisterSalesArrangementId).HasColumnName("register_sales_arrangement_id");
+
+                entity.Property(e => e.ActionId)
+                    .IsRequired()
+                    .HasMaxLength(18)
+                    .IsUnicode(false)
+                    .HasColumnName("action_id");
+
+                entity.Property(e => e.Aipo1UserId).HasColumnName("aipo1_user_id");
+
+                entity.Property(e => e.Aipo2UserId).HasColumnName("aipo2_user_id");
+
+                entity.Property(e => e.ApeuDocId).HasColumnName("apeu_doc_id");
+
+                entity.Property(e => e.ApprovalDateCipo)
+                    .HasColumnType("date")
+                    .HasColumnName("approval_date_cipo");
+
+                entity.Property(e => e.AssignedTo).HasColumnName("assigned_to");
+
+                entity.Property(e => e.AvailableToPublic)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("available_to_public")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.CaseId).HasColumnName("case_id");
+
+                entity.Property(e => e.CheckDateAipo1)
+                    .HasColumnType("date")
+                    .HasColumnName("check_date_aipo1");
+
+                entity.Property(e => e.CheckDateAipo2)
+                    .HasColumnType("date")
+                    .HasColumnName("check_date_aipo2");
+
+                entity.Property(e => e.CheckDateIpo1)
+                    .HasColumnType("date")
+                    .HasColumnName("check_date_ipo1");
+
+                entity.Property(e => e.CheckDateIpo2)
+                    .HasColumnType("date")
+                    .HasColumnName("check_date_ipo2");
+
+                entity.Property(e => e.CipoUserId).HasColumnName("cipo_user_id");
+
+                entity.Property(e => e.CreateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("create_date");
+
+                entity.Property(e => e.CreateUser).HasColumnName("create_user");
+
+                entity.Property(e => e.DevelopmentNo)
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("development_no");
+
+                entity.Property(e => e.DocRefNo)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("doc_ref_no");
+
+                entity.Property(e => e.EndorsementDateSipo1)
+                    .HasColumnType("date")
+                    .HasColumnName("endorsement_date_sipo1");
+
+                entity.Property(e => e.EndorsementDateSipo2)
+                    .HasColumnType("date")
+                    .HasColumnName("endorsement_date_sipo2");
+
+                entity.Property(e => e.FirstDateSales)
+                    .HasColumnType("date")
+                    .HasColumnName("first_date_sales");
+
+                entity.Property(e => e.FirstPrintDate)
+                    .HasColumnType("date")
+                    .HasColumnName("first_print_date");
+
+                entity.Property(e => e.Ipo1UserId).HasColumnName("ipo1_user_id");
+
+                entity.Property(e => e.Ipo2UserId).HasColumnName("ipo2_user_id");
+
+                entity.Property(e => e.IsComplianceGuideline)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_compliance_guideline")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.IsComplianceOrdinance)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_compliance_ordinance")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.IsDeleted)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_deleted")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.IssuingDate)
+                    .HasColumnType("date")
+                    .HasColumnName("issuing_date");
+
+                entity.Property(e => e.ReferralDateIcau)
+                    .HasColumnType("datetime")
+                    .HasColumnName("referral_date_icau");
+
+                entity.Property(e => e.Remarks)
+                    .HasMaxLength(300)
+                    .IsUnicode(false)
+                    .HasColumnName("remarks");
+
+                entity.Property(e => e.RemarksReturn)
+                    .HasMaxLength(300)
+                    .IsUnicode(false)
+                    .HasColumnName("remarks_return");
+
+                entity.Property(e => e.SaType)
+                    .HasMaxLength(10)
+                    .IsUnicode(false)
+                    .HasColumnName("sa_type");
+
+                entity.Property(e => e.SerialNo)
+                    .HasMaxLength(15)
+                    .IsUnicode(false)
+                    .HasColumnName("serial_no");
+
+                entity.Property(e => e.Sipo1UserId).HasColumnName("sipo1_user_id");
+
+                entity.Property(e => e.Sipo2UserId).HasColumnName("sipo2_user_id");
+
+                entity.Property(e => e.SisSuspensionOnly)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("sis_suspension_only")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.SiteInspectionBy).HasColumnName("site_inspection_by");
+
+                entity.Property(e => e.SiteInspectionDate)
+                    .HasColumnType("date")
+                    .HasColumnName("site_inspection_date");
+
+                entity.Property(e => e.Status)
+                    .IsRequired()
+                    .HasMaxLength(10)
+                    .IsUnicode(false)
+                    .HasColumnName("status")
+                    .HasDefaultValueSql("('I')");
+
+                entity.Property(e => e.TenderPeriod)
+                    .HasMaxLength(40)
+                    .IsUnicode(false)
+                    .HasColumnName("tender_period");
+
+                entity.Property(e => e.UpdateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("update_date");
+
+                entity.Property(e => e.UpdateUser).HasColumnName("update_user");
+
+                entity.Property(e => e.UploadDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("upload_date");
+
+                entity.Property(e => e.UploadUser).HasColumnName("upload_user");
+            });
+
+            modelBuilder.Entity<RegisterSalesBrochure>(entity =>
+            {
+                entity.ToTable("register_sales_brochure");
+
+                entity.Property(e => e.RegisterSalesBrochureId).HasColumnName("register_sales_brochure_id");
+
+                entity.Property(e => e.ActionId)
+                    .IsRequired()
+                    .HasMaxLength(18)
+                    .IsUnicode(false)
+                    .HasColumnName("action_id");
+
+                entity.Property(e => e.Aipo1UserId).HasColumnName("aipo1_user_id");
+
+                entity.Property(e => e.Aipo2UserId).HasColumnName("aipo2_user_id");
+
+                entity.Property(e => e.ApeuDocId).HasColumnName("apeu_doc_id");
+
+                entity.Property(e => e.ApprovalDateCipo)
+                    .HasColumnType("date")
+                    .HasColumnName("approval_date_cipo");
+
+                entity.Property(e => e.AssignedTo).HasColumnName("assigned_to");
+
+                entity.Property(e => e.AvailableDateSrpe)
+                    .HasColumnType("date")
+                    .HasColumnName("available_date_srpe");
+
+                entity.Property(e => e.AvailableDateVendor)
+                    .HasColumnType("date")
+                    .HasColumnName("available_date_vendor");
+
+                entity.Property(e => e.AvailableToPublic)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("available_to_public")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.CaseId).HasColumnName("case_id");
+
+                entity.Property(e => e.CheckDateAipo1)
+                    .HasColumnType("date")
+                    .HasColumnName("check_date_aipo1");
+
+                entity.Property(e => e.CheckDateAipo2)
+                    .HasColumnType("date")
+                    .HasColumnName("check_date_aipo2");
+
+                entity.Property(e => e.CheckDateIpo1)
+                    .HasColumnType("date")
+                    .HasColumnName("check_date_ipo1");
+
+                entity.Property(e => e.CheckDateIpo2)
+                    .HasColumnType("date")
+                    .HasColumnName("check_date_ipo2");
+
+                entity.Property(e => e.CipoUserId).HasColumnName("cipo_user_id");
+
+                entity.Property(e => e.CreateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("create_date");
+
+                entity.Property(e => e.CreateUser).HasColumnName("create_user");
+
+                entity.Property(e => e.DevelopmentNo)
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("development_no");
+
+                entity.Property(e => e.DocRefNo)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("doc_ref_no");
+
+                entity.Property(e => e.EndorsementDateSipo1)
+                    .HasColumnType("date")
+                    .HasColumnName("endorsement_date_sipo1");
+
+                entity.Property(e => e.EndorsementDateSipo2)
+                    .HasColumnType("date")
+                    .HasColumnName("endorsement_date_sipo2");
+
+                entity.Property(e => e.ExaminationDate)
+                    .HasColumnType("date")
+                    .HasColumnName("examination_date");
+
+                entity.Property(e => e.FirstDateSales)
+                    .HasColumnType("date")
+                    .HasColumnName("first_date_sales");
+
+                entity.Property(e => e.FirstPrintDate)
+                    .HasColumnType("date")
+                    .HasColumnName("first_print_date");
+
+                entity.Property(e => e.Ipo1UserId).HasColumnName("ipo1_user_id");
+
+                entity.Property(e => e.Ipo2UserId).HasColumnName("ipo2_user_id");
+
+                entity.Property(e => e.IsComplianceGuideline)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_compliance_guideline")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.IsComplianceOrdinance)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_compliance_ordinance")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.IsDeleted)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_deleted")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.NoOfListedProperties).HasColumnName("no_of_listed_properties");
+
+                entity.Property(e => e.ReceivedDateSrpa)
+                    .HasColumnType("date")
+                    .HasColumnName("received_date_srpa");
+
+                entity.Property(e => e.ReferralDateIcau)
+                    .HasColumnType("datetime")
+                    .HasColumnName("referral_date_icau");
+
+                entity.Property(e => e.Remarks)
+                    .HasMaxLength(300)
+                    .IsUnicode(false)
+                    .HasColumnName("remarks");
+
+                entity.Property(e => e.RemarksReturn)
+                    .HasMaxLength(300)
+                    .IsUnicode(false)
+                    .HasColumnName("remarks_return");
+
+                entity.Property(e => e.SbType)
+                    .HasMaxLength(10)
+                    .IsUnicode(false)
+                    .HasColumnName("sb_type");
+
+                entity.Property(e => e.SerialNo)
+                    .HasMaxLength(15)
+                    .IsUnicode(false)
+                    .HasColumnName("serial_no");
+
+                entity.Property(e => e.Sipo1UserId).HasColumnName("sipo1_user_id");
+
+                entity.Property(e => e.Sipo2UserId).HasColumnName("sipo2_user_id");
+
+                entity.Property(e => e.SiteInspectionBy).HasColumnName("site_inspection_by");
+
+                entity.Property(e => e.SiteInspectionDate)
+                    .HasColumnType("date")
+                    .HasColumnName("site_inspection_date");
+
+                entity.Property(e => e.Status)
+                    .IsRequired()
+                    .HasMaxLength(10)
+                    .IsUnicode(false)
+                    .HasColumnName("status")
+                    .HasDefaultValueSql("('I')");
+
+                entity.Property(e => e.UpdateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("update_date");
+
+                entity.Property(e => e.UpdateUser).HasColumnName("update_user");
+
+                entity.Property(e => e.UploadDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("upload_date");
+
+                entity.Property(e => e.UploadUser).HasColumnName("upload_user");
+            });
+
+            modelBuilder.Entity<RegisterShowFlat>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("register_show_flat");
+
+                entity.Property(e => e.ActionId)
+                    .IsRequired()
+                    .HasMaxLength(18)
+                    .IsUnicode(false)
+                    .HasColumnName("action_id");
+
+                entity.Property(e => e.ApprovalDateCipo)
+                    .HasColumnType("date")
+                    .HasColumnName("approval_date_cipo");
+
+                entity.Property(e => e.AssignedTo).HasColumnName("assigned_to");
+
+                entity.Property(e => e.AvailableDate)
+                    .HasColumnType("date")
+                    .HasColumnName("available_date");
+
+                entity.Property(e => e.CaseId).HasColumnName("case_id");
+
+                entity.Property(e => e.CheckingCompletionDate)
+                    .HasColumnType("date")
+                    .HasColumnName("checking_completion_date");
+
+                entity.Property(e => e.CipoUserId).HasColumnName("cipo_user_id");
+
+                entity.Property(e => e.CompleteDateIcau)
+                    .HasColumnType("date")
+                    .HasColumnName("complete_date_icau");
+
+                entity.Property(e => e.CreateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("create_date");
+
+                entity.Property(e => e.CreateUser).HasColumnName("create_user");
+
+                entity.Property(e => e.DateReportSipo)
+                    .HasColumnType("date")
+                    .HasColumnName("date_report_sipo");
+
+                entity.Property(e => e.DevelopmentNo)
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("development_no");
+
+                entity.Property(e => e.FloorNo)
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("floor_no");
+
+                entity.Property(e => e.InspectionId).HasColumnName("inspection_id");
+
+                entity.Property(e => e.IsAvailableForView)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_available_for_view")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.IsComplianceGuideline)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_compliance_guideline")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.IsComplianceOrdinance)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_compliance_ordinance")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.IsDeleted)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_deleted")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.OnSiteCheckingDate)
+                    .HasColumnType("date")
+                    .HasColumnName("on_site_checking_date");
+
+                entity.Property(e => e.RegisterShowFlatId)
+                    .ValueGeneratedOnAdd()
+                    .HasColumnName("register_show_flat_id");
+
+                entity.Property(e => e.Remarks)
+                    .HasMaxLength(300)
+                    .IsUnicode(false)
+                    .HasColumnName("remarks");
+
+                entity.Property(e => e.RemarksReturn)
+                    .HasMaxLength(300)
+                    .IsUnicode(false)
+                    .HasColumnName("remarks_return");
+
+                entity.Property(e => e.SerialNo)
+                    .HasMaxLength(15)
+                    .IsUnicode(false)
+                    .HasColumnName("serial_no");
+
+                entity.Property(e => e.ShowFlatLocation)
+                    .HasMaxLength(200)
+                    .IsUnicode(false)
+                    .HasColumnName("show_flat_location");
+
+                entity.Property(e => e.ShowFlatNo)
+                    .HasMaxLength(15)
+                    .IsUnicode(false)
+                    .HasColumnName("show_flat_no");
+
+                entity.Property(e => e.ShowFlatScale)
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("show_flat_scale");
+
+                entity.Property(e => e.SipoUserId).HasColumnName("sipo_user_id");
+
+                entity.Property(e => e.SiteInspectionBy).HasColumnName("site_inspection_by");
+
+                entity.Property(e => e.Unit)
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("unit");
+
+                entity.Property(e => e.UpdateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("update_date");
+
+                entity.Property(e => e.UpdateUser).HasColumnName("update_user");
+
+                entity.Property(e => e.UploadDate)
+                    .HasColumnType("date")
+                    .HasColumnName("upload_date");
+
+                entity.Property(e => e.UploadUser).HasColumnName("upload_user");
+            });
+
+            modelBuilder.Entity<RegisterTransactionMaster>(entity =>
+            {
+                entity.ToTable("register_transaction_master");
+
+                entity.Property(e => e.RegisterTransactionMasterId)
+                    .ValueGeneratedNever()
+                    .HasColumnName("register_transaction_master_id");
+
+                entity.Property(e => e.ActionId)
+                    .IsRequired()
+                    .HasMaxLength(18)
+                    .IsUnicode(false)
+                    .HasColumnName("action_id");
+
+                entity.Property(e => e.ApeuDocId).HasColumnName("apeu_doc_id");
+
+                entity.Property(e => e.AssignedTo).HasColumnName("assigned_to");
+
+                entity.Property(e => e.CreateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("create_date");
+
+                entity.Property(e => e.CreateUser).HasColumnName("create_user");
+
+                entity.Property(e => e.DevelopmentNo)
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("development_no");
+
+                entity.Property(e => e.IsDeleted)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_deleted")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.SerialNo)
+                    .HasMaxLength(15)
+                    .IsUnicode(false)
+                    .HasColumnName("serial_no");
+
+                entity.Property(e => e.UpdateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("update_date");
+
+                entity.Property(e => e.UpdateUser).HasColumnName("update_user");
+
+                entity.Property(e => e.UploadDate)
+                    .HasColumnType("date")
+                    .HasColumnName("upload_date");
+
+                entity.Property(e => e.UploadUser).HasColumnName("upload_user");
+            });
+            modelBuilder.Entity<ApeuLogDoc>(entity =>
+            {
+                entity.HasKey(e => e.ApeuDocId);
+
+                entity.ToTable("apeu_log_doc");
+
+                entity.Property(e => e.ApeuDocId).HasColumnName("apeu_doc_id");
+
+                entity.Property(e => e.ActionId)
+                    .IsRequired()
+                    .HasMaxLength(18)
+                    .IsUnicode(false)
+                    .HasColumnName("action_id");
+
+                entity.Property(e => e.ApeuLogId).HasColumnName("apeu_log_id");
+
+                entity.Property(e => e.CreateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("create_date");
+
+                entity.Property(e => e.CreateUser).HasColumnName("create_user");
+
+                entity.Property(e => e.Date1)
+                    .HasColumnType("date")
+                    .HasColumnName("date1");
+
+                entity.Property(e => e.Date2)
+                    .HasColumnType("date")
+                    .HasColumnName("date2");
+
+                entity.Property(e => e.DocName)
+                    .HasMaxLength(200)
+                    .HasColumnName("doc_name");
+
+                entity.Property(e => e.DocRef)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("doc_ref");
+
+                entity.Property(e => e.DocRef2)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("doc_ref2");
+
+                entity.Property(e => e.DocSeq)
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("doc_seq");
+
+                entity.Property(e => e.DocType)
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("doc_type");
+
+                entity.Property(e => e.FirstDateSales)
+                    .HasColumnType("date")
+                    .HasColumnName("first_date_sales");
+
+                entity.Property(e => e.IsDeleted)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_deleted")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.IsEmailSent)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_email_sent")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.TotalNoOfUnits).HasColumnName("total_no_of_units");
+
+                entity.Property(e => e.UpdateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("update_date");
+
+                entity.Property(e => e.UpdateUser).HasColumnName("update_user");
             });
             OnModelCreatingPartial(modelBuilder);
         }

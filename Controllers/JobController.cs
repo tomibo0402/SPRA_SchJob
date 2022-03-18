@@ -23,7 +23,6 @@ namespace SPRA_SchJob.Controllers
             try
             {
                 Logger.Info("Send Email Service");
-                rtn = __EmailService.TriggerSendEmail();
             }
             catch (Exception e)
             {

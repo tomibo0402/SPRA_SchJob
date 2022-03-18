@@ -19,5 +19,20 @@ namespace SPRA_SchJob.Repository
         {
             return Context.Set<TEntity>().AsQueryable();
         }
+
+        public void Insert(List<TEntity> Entity)
+        {
+            Context.Set<TEntity>().AddRange(Entity);
+        }
+
+        public void Update(List<TEntity> Entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public TEntity GetRecordById(int id)
+        {
+            return Context.Set<TEntity>().Find(id);
+        }
     }
 }
