@@ -18,10 +18,6 @@ namespace SPRA_SchJob.Jobs
         {
             _emailService = emailService;
         }
-        public List<CronJob> GetEmailSchedule()
-        {
-            return _emailService.GetScheduler();
-        }
         public Task Execute(IJobExecutionContext context)
         {
 

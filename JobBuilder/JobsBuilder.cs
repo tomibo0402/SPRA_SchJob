@@ -15,24 +15,31 @@ namespace SPRA_SchJob.Jobs
         private const string _sendEmailServiceName = "SEND_EMAIL";
         public static void BuildScheduler(this IServiceCollectionQuartzConfigurator q, IServiceCollection services)
         {
-            var serviceProvider = services.BuildServiceProvider();
-            var emailService = serviceProvider.GetService<IEmailService<SPRA_SCHContext>>();
-
-            List<CronJob> cronJobs = emailService.GetScheduler();
-
-            Logger.Info("Init Scheduler");
-
-
-            foreach (var cj in cronJobs)
+            try
             {
-                var serviceName = cj.ServiceName;
-                serviceName = serviceName.Contains(_sendEmailServiceName) ? _sendEmailServiceName : serviceName;
+                var serviceProvider = services.BuildServiceProvider();
+                var emailService = serviceProvider.GetService<IEmailService<SPRA_SCHContext>>();
 
-                q.ScheduleJob<JobScheduler>(trigger => trigger
-                   .StartNow()
-                   .WithCronSchedule(cj.CronExpression)
-                   .UsingJobData("MethodName", serviceName)
-                );
+                List<CronJob> cronJobs = emailService.GetScheduler();
+
+                Logger.Info("Init Scheduler");
+
+
+                foreach (var cj in cronJobs)
+                {
+                    var serviceName = cj.ServiceName;
+                    serviceName = serviceName.Contains(_sendEmailServiceName) ? _sendEmailServiceName : serviceName;
+
+                    q.ScheduleJob<JobScheduler>(trigger => trigger
+                       .StartNow()
+                       .WithCronSchedule(cj.CronExpression)
+                       .UsingJobData("MethodName", serviceName)
+                    );
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Info(e.Message);
             }
         }
         public static EmailConfig GetEmailConfig(IServiceCollection services)
