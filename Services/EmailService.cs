@@ -122,7 +122,7 @@ namespace SPRA_SchJob.Services
             }
         }
 
-        public void SEND_EMAIL()
+        public async Task SEND_EMAIL()
         {
             using (TransactionScope tx = new TransactionScope(TransactionScopeOption.Suppress))
             {
@@ -145,7 +145,7 @@ namespace SPRA_SchJob.Services
                     if (!emailToSend.Any())
                         return;
 
-                    __emailClient.SendMessage(emailToSend.ToList()).GetAwaiter().GetResult();
+                    await __emailClient.SendMessage(emailToSend.ToList());
 
                     // update email record is_sent
                     (from ets in emailToSend
