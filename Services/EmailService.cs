@@ -17,7 +17,6 @@ namespace SPRA_SchJob.Services
     {
         private readonly IMISUnitOfWork<SPRA_SCHContext> __misunitofwork;
         private readonly EmailClient __emailClient;
-        private const string ActionIdFormat = "yyyyMMddHHmmssfff";
         public EmailService(IMISUnitOfWork<SPRA_SCHContext> unitOfWork, EmailClient emailClient = null)
         {
             __emailClient = emailClient;
@@ -31,7 +30,6 @@ namespace SPRA_SchJob.Services
 
                 try
                 {
-                    DateTime currTime = DateTime.Now;
                     var salesDocEmail = from aplog in __misunitofwork.GetRepository<ApeuLogDoc>().GetEntity()
                                                    .Where(e => e.IsDeleted == "N" && e.DocType == "SRPE" && e.IsEmailSent == 'N')
                                         from email in __misunitofwork.GetRepository<SalesDocEmail>().GetEntity()
@@ -76,27 +74,40 @@ namespace SPRA_SchJob.Services
                          ra
                      }).ToList().ForEach(e =>
                      {
-                         if (e.rpl != null) { e.rpl.AssignedTo = e.userID; e.rpl.UpdateUser = 0; e.rpl.UpdateDate = DateTime.Now; }
-                         if (e.rsa != null) { e.rsa.AssignedTo = e.userID; e.rpl.UpdateUser = 0; e.rpl.UpdateDate = DateTime.Now; }
-                         if (e.rsb != null) { e.rsa.AssignedTo = e.userID; e.rpl.UpdateUser = 0; e.rpl.UpdateDate = DateTime.Now; }
-                         if (e.rsf != null) { e.rsa.AssignedTo = e.userID; e.rpl.UpdateUser = 0; e.rpl.UpdateDate = DateTime.Now; }
-                         if (e.ra != null) { e.rsa.AssignedTo = e.userID; e.rpl.UpdateUser = 0; e.rpl.UpdateDate = DateTime.Now; }
+                         if (e.rpl != null) { e.rpl.AssignedTo = e.userID; CommonTools.SetCommonFieldForUpdate(e.rpl); }
+                         if (e.rsa != null) { e.rsa.AssignedTo = e.userID; CommonTools.SetCommonFieldForUpdate(e.rsa); }
+                         if (e.rsb != null) { e.rsb.AssignedTo = e.userID; CommonTools.SetCommonFieldForUpdate(e.rsb); }
+                         if (e.rsf != null) { e.rsf.AssignedTo = e.userID; CommonTools.SetCommonFieldForUpdate(e.rsf); }
+                         if (e.ra != null) { e.ra.AssignedTo = e.userID; CommonTools.SetCommonFieldForUpdate(e.ra); }
                      });
 
 
                     //insert email history record
-                    __misunitofwork.GetRepository<EmailRecord>().Insert(salesDocEmail.Select(e => new EmailRecord
+                    __misunitofwork.GetRepository<EmailRecord>().Insert(salesDocEmail.AsEnumerable().Select(e =>
                     {
-                        ReceivedPost = e.Post,
-                        Subject = "",
-                        ReceivedUser = e.UserID,
-                        CreateUser = 0,
-                        CreateDate = DateTime.Now,
-                        Content = e.Message,
-                        IsSent = "N",
-                        IsDeleted = "N",
-                        ActionId = currTime.ToString(ActionIdFormat)
+                        var er = new EmailRecord
+                        {
+                            ReceivedPost = e.Post,
+                            Subject = "",
+                            ReceivedUser = e.UserID,
+                            Content = e.Message,
+                            IsSent = "N",
+                            IsDeleted = "N"
+                        };
+                        CommonTools.SetCommonFieldForCreate(er);
+                        return er;
                     }).ToList()); ;
+
+                    // update apeu log doc
+                    (from sde in salesDocEmail
+                     from aplog in __misunitofwork.GetRepository<ApeuLogDoc>().GetEntity()
+                                                    .Where(e => e.ApeuDocId == sde.ApeuDocID)
+                     select aplog)
+                        .ToList().ForEach(e =>
+                     {
+                         e.IsEmailSent = 'Y';
+                         CommonTools.SetCommonFieldForUpdate(e);
+                     });
 
                     __misunitofwork.Commit();
 
@@ -137,30 +148,15 @@ namespace SPRA_SchJob.Services
                     __emailClient.SendMessage(emailToSend.ToList()).GetAwaiter().GetResult();
 
                     // update email record is_sent
-
                     (from ets in emailToSend
                      from er in __misunitofwork.GetRepository<EmailRecord>().GetEntity().Where(e => e.EmailRecordId == ets.EmailRecordID)
                      select er)
                             .ToList().ForEach(e =>
                             {
                                 e.IsSent = "Y";
-                                e.UpdateDate = DateTime.Now;
-                                e.UpdateUser = 0;
+                                CommonTools.SetCommonFieldForUpdate(e);
                                 e.SendDatetime = DateTime.Now;
-                                e.ActionId = currTime.ToString(ActionIdFormat);
                             });
-
-
-                    // update apeu log doc
-                    (from ald in __misunitofwork.GetRepository<ApeuLogDoc>().GetEntity()
-                           .Where(e => e.IsDeleted == "N" && e.DocType == "SRPE" && e.IsEmailSent == 'N')
-                     select ald).ToList().ForEach(e =>
-                     {
-                         e.IsEmailSent = 'Y';
-                         e.UpdateDate = DateTime.Now;
-                         e.UpdateUser = 0;
-                         e.ActionId = currTime.ToString(ActionIdFormat);
-                     });
 
                     __misunitofwork.Commit();
                     tx.Complete();
