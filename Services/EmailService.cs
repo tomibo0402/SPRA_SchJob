@@ -24,7 +24,7 @@ namespace SPRA_SchJob.Services
         }
         public void CREATE_SALES_DOC_EMAIL_RECORD()
         {
-            using (TransactionScope tx = new TransactionScope(TransactionScopeOption.Suppress))
+            using (TransactionScope tx = new TransactionScope(TransactionScopeOption.Required))
             {
                 Logger.Info("Running Create Email Record Schedule Job");
 
@@ -46,6 +46,7 @@ namespace SPRA_SchJob.Services
                                             ApeuDocID = aplog.ApeuDocId,
                                             UserID = user.UserId,
                                             Post = user.Post,
+                                            Subject = et.Subject,
                                             Message = __emailClient.BuildMessage(et.Content, messageValue),
                                             EmailAddress = user.Email
                                         };
@@ -88,7 +89,7 @@ namespace SPRA_SchJob.Services
                         var er = new EmailRecord
                         {
                             ReceivedPost = e.Post,
-                            Subject = "",
+                            Subject = e.Subject,
                             ReceivedUser = e.UserID,
                             Content = e.Message,
                             IsSent = "N",
@@ -124,7 +125,7 @@ namespace SPRA_SchJob.Services
 
         public async Task SEND_EMAIL()
         {
-            using (TransactionScope tx = new TransactionScope(TransactionScopeOption.Suppress))
+            using (TransactionScope tx = new TransactionScope(TransactionScopeOption.Required))
             {
                 Logger.Info("Running Send Email Schedule Job");
                 try

@@ -19,8 +19,7 @@ namespace SPRA_SchJob.Jobs
             var emailService = serviceProvider.GetService<IEmailService<SPRA_SCHContext>>();
 
             List<CronJob> cronJobs = emailService.GetScheduler();
-            StdSchedulerFactory factory = new StdSchedulerFactory();
-            IScheduler sched = factory.GetScheduler().GetAwaiter().GetResult();
+
             Logger.Info("Init Scheduler");
 
 
