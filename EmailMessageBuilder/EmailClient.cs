@@ -23,7 +23,8 @@ namespace SPRA_SchJob.EmailMessageBuilder
         {
             foreach (var emailObject in emailMessage)
             {
-                MailMessage message = new MailMessage("necafcsmtp@gmail.com", emailObject.EmailAddress);
+                var fromEmail = __smtpClient.Credentials.GetCredential(__smtpClient.Host, __smtpClient.Port, "").UserName;
+                MailMessage message = new MailMessage(fromEmail, emailObject.EmailAddress);
                 message.Subject = emailObject.Subject;
                 message.IsBodyHtml = true;
                 message.Body = emailObject.Message;
