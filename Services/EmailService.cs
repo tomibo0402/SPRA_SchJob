@@ -17,6 +17,7 @@ namespace SPRA_SchJob.Services
     {
         private readonly IMISUnitOfWork<SPRA_SCHContext> __misunitofwork;
         private readonly EmailClient __emailClient;
+        private const string ActionIdFormat = "yyyyMMddHHmmssfff";
         public EmailService(IMISUnitOfWork<SPRA_SCHContext> unitOfWork, EmailClient emailClient = null)
         {
             __emailClient = emailClient;
@@ -24,14 +25,15 @@ namespace SPRA_SchJob.Services
         }
         public void CREATE_SALES_DOC_EMAIL_RECORD()
         {
-            using (TransactionScope tx = new TransactionScope())
+            using (TransactionScope tx = new TransactionScope(TransactionScopeOption.Suppress))
             {
                 Logger.Info("Running job Sales Document Schedule Job");
 
                 try
                 {
+                    DateTime currTime = DateTime.Now;
                     var salesDocEmail = from aplog in __misunitofwork.GetRepository<ApeuLogDoc>().GetEntity()
-                                                   .Where(e => e.IsDeleted == "N" && e.DocType == "SRPE" && e.IsEmailSent == "N")
+                                                   .Where(e => e.IsDeleted == "N" && e.DocType == "SRPE" && e.IsEmailSent == 'N')
                                         from email in __misunitofwork.GetRepository<SalesDocEmail>().GetEntity()
                                                    .Where(e => e.IsDeleted == "N" && e.DocType == aplog.DocType)
                                         from ct in __misunitofwork.GetRepository<CodeTable>().GetEntity()
@@ -93,8 +95,8 @@ namespace SPRA_SchJob.Services
                         Content = e.Message,
                         IsSent = "N",
                         IsDeleted = "N",
-                        ActionId = "0"
-                    }).ToList());
+                        ActionId = currTime.ToString(ActionIdFormat)
+                    }).ToList()); ;
 
                     __misunitofwork.Commit();
 
@@ -111,11 +113,12 @@ namespace SPRA_SchJob.Services
 
         public void SEND_EMAIL()
         {
-            using (TransactionScope tx = new TransactionScope())
+            using (TransactionScope tx = new TransactionScope(TransactionScopeOption.Suppress))
             {
                 Logger.Info("Running job Send Email Schedule Job");
                 try
                 {
+                    DateTime currTime = DateTime.Now;
                     var emailToSend = from email in __misunitofwork.GetRepository<EmailRecord>().GetEntity()
                                                        .Where(e => e.IsDeleted == "N" && e.IsSent == "N")
                                       from user in __misunitofwork.GetRepository<SystemUser>().GetEntity()
@@ -144,17 +147,19 @@ namespace SPRA_SchJob.Services
                                 e.UpdateDate = DateTime.Now;
                                 e.UpdateUser = 0;
                                 e.SendDatetime = DateTime.Now;
+                                e.ActionId = currTime.ToString(ActionIdFormat);
                             });
 
 
-                    ////update apeu log doc
+                    // update apeu log doc
                     (from ald in __misunitofwork.GetRepository<ApeuLogDoc>().GetEntity()
-                            .Where(e => e.IsDeleted == "N" && e.DocType == "SRPE" && e.IsEmailSent == "N")
+                           .Where(e => e.IsDeleted == "N" && e.DocType == "SRPE" && e.IsEmailSent == 'N')
                      select ald).ToList().ForEach(e =>
                      {
-                         e.IsEmailSent = "Y";
+                         e.IsEmailSent = 'Y';
                          e.UpdateDate = DateTime.Now;
                          e.UpdateUser = 0;
+                         e.ActionId = currTime.ToString(ActionIdFormat);
                      });
 
                     __misunitofwork.Commit();
