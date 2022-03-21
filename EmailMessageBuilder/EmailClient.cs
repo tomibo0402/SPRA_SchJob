@@ -24,7 +24,8 @@ namespace SPRA_SchJob.EmailMessageBuilder
             foreach (var emailObject in emailMessage)
             {
                 MailMessage message = new MailMessage("necafcsmtp@gmail.com", emailObject.EmailAddress);
-                message.Subject = "Sales Document notice";
+                message.Subject = emailObject.Subject;
+                message.IsBodyHtml = true;
                 message.Body = emailObject.Message;
                 __smtpClient.Send(message);
             }

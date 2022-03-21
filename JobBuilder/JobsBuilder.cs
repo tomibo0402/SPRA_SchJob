@@ -12,7 +12,7 @@ namespace SPRA_SchJob.Jobs
 {
     public static class JobsBuilder
     {
-
+        private const string _sendEmailServiceName = "SEND_EMAIL";
         public static void BuildScheduler(this IServiceCollectionQuartzConfigurator q, IServiceCollection services)
         {
             var serviceProvider = services.BuildServiceProvider();
@@ -22,12 +22,17 @@ namespace SPRA_SchJob.Jobs
             StdSchedulerFactory factory = new StdSchedulerFactory();
             IScheduler sched = factory.GetScheduler().GetAwaiter().GetResult();
             Logger.Info("Init Scheduler");
+
+
             foreach (var cj in cronJobs)
             {
+                var serviceName = cj.ServiceName;
+                serviceName = serviceName.Contains(_sendEmailServiceName) ? _sendEmailServiceName : serviceName;
+
                 q.ScheduleJob<JobScheduler>(trigger => trigger
                    .StartNow()
                    .WithCronSchedule(cj.CronExpression)
-                   .UsingJobData("MethodName", cj.ServiceName)
+                   .UsingJobData("MethodName", serviceName)
                 );
             }
         }

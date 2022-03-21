@@ -26,7 +26,7 @@ namespace SPRA_SchJob.Services
         {
             using (TransactionScope tx = new TransactionScope(TransactionScopeOption.Suppress))
             {
-                Logger.Info("Running job Sales Document Schedule Job");
+                Logger.Info("Running Create Email Record Schedule Job");
 
                 try
                 {
@@ -126,7 +126,7 @@ namespace SPRA_SchJob.Services
         {
             using (TransactionScope tx = new TransactionScope(TransactionScopeOption.Suppress))
             {
-                Logger.Info("Running job Send Email Schedule Job");
+                Logger.Info("Running Send Email Schedule Job");
                 try
                 {
                     DateTime currTime = DateTime.Now;
