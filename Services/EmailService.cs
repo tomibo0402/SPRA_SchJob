@@ -54,11 +54,12 @@ namespace SPRA_SchJob.Services
 
                     CreateEmailRecordAndUpdateRelatedFields(salesDocEmail);
 
-                    await SendEmail();
+                    await SendEmail(salesDocEmail);
                     tx.Complete();
                 }
                 catch (Exception e)
                 {
+                    __misunitofwork.Rollback();
                     tx.Dispose();
                     Logger.Error(e.Message);
                 }
@@ -97,11 +98,13 @@ namespace SPRA_SchJob.Services
 
                     CreateEmailRecordAndUpdateRelatedFields(salesDocEmail);
 
-                    await SendEmail();
+                    await SendEmail(salesDocEmail);
+
                     tx.Complete();
                 }
                 catch (Exception e)
                 {
+                    __misunitofwork.Rollback();
                     tx.Dispose();
                     Logger.Error(e.Message);
                 }
@@ -135,7 +138,7 @@ namespace SPRA_SchJob.Services
 
         #region private
 
-        private async Task SendEmail()
+        private async Task SendEmail(IQueryable<DocEmailModel> docEmail)
         {
             Logger.Info("Running Send Email Schedule Job");
             DateTime currTime = DateTime.Now;
@@ -166,6 +169,18 @@ namespace SPRA_SchJob.Services
                         CommonTools.SetCommonFieldForUpdate(e);
                         e.SendDatetime = DateTime.Now;
                     });
+
+            // update apeu log doc
+            (from sde in docEmail
+             from aplog in __misunitofwork.GetRepository<ApeuLogDoc>().GetEntity()
+                                            .Where(e => e.ApeuDocId == sde.ApeuDocID)
+             select aplog)
+                .ToList().ForEach(e =>
+                {
+                    e.IsEmailSent = 'Y';
+                    CommonTools.SetCommonFieldForUpdate(e);
+                });
+
             __misunitofwork.Commit();
         }
         private void CreateEmailRecordAndUpdateRelatedFields(IQueryable<DocEmailModel> salesDocEmail)
@@ -217,16 +232,7 @@ namespace SPRA_SchJob.Services
                 return er;
             }).ToList()); ;
 
-            // update apeu log doc
-            (from sde in salesDocEmail
-             from aplog in __misunitofwork.GetRepository<ApeuLogDoc>().GetEntity()
-                                            .Where(e => e.ApeuDocId == sde.ApeuDocID)
-             select aplog)
-                .ToList().ForEach(e =>
-                {
-                    e.IsEmailSent = 'Y';
-                    CommonTools.SetCommonFieldForUpdate(e);
-                });
+
             __misunitofwork.Commit();
         }
     }
