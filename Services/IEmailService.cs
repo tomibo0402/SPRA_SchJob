@@ -8,8 +8,9 @@ namespace SPRA_SchJob.Services
 {
     public interface IEmailService<SPRA_SchDBContext>
     {
-        public Task SEND_EMAIL();
-        public void CREATE_SALES_DOC_EMAIL_RECORD();
+        public Task SRPE_ACCOUNT_NOTIFICATION();
+        public Task NEW_RECEIVED_DOCUMENT_NOTIFICATION();
+
         public List<CronJob> GetScheduler();
         public EmailConfig GetEmailConfig();
 

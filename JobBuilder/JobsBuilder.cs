@@ -12,7 +12,7 @@ namespace SPRA_SchJob.Jobs
 {
     public static class JobsBuilder
     {
-        private const string _sendEmailServiceName = "SEND_EMAIL";
+        private const string _sendEmailServiceName = "NEW_RECEIVED_DOCUMENT_NOTIFICATION";
         public static void BuildScheduler(this IServiceCollectionQuartzConfigurator q, IServiceCollection services)
         {
             try
@@ -21,7 +21,6 @@ namespace SPRA_SchJob.Jobs
                 var emailService = serviceProvider.GetService<IEmailService<SPRA_SCHContext>>();
 
                 List<CronJob> cronJobs = emailService.GetScheduler();
-
                 Logger.Info("Init Scheduler");
 
 
@@ -39,7 +38,7 @@ namespace SPRA_SchJob.Jobs
             }
             catch (Exception e)
             {
-                Logger.Info(e.Message);
+                Logger.Error(e.Message);
             }
         }
         public static EmailConfig GetEmailConfig(IServiceCollection services)
