@@ -52,9 +52,9 @@ namespace SPRA_SchJob.Services
                     if (!salesDocEmail.Any())
                         return;
 
-                    CreateEmailRecordAndUpdateRelatedFields(salesDocEmail);
+                    InsertEmailRecord(salesDocEmail);
 
-                    await SendEmail(salesDocEmail);
+                    await SendEmailAndUpdateRelatedField(salesDocEmail);
                     tx.Complete();
                 }
                 catch (Exception e)
@@ -96,9 +96,9 @@ namespace SPRA_SchJob.Services
                     if (!salesDocEmail.Any())
                         return;
 
-                    CreateEmailRecordAndUpdateRelatedFields(salesDocEmail);
+                    InsertEmailRecord(salesDocEmail);
 
-                    await SendEmail(salesDocEmail);
+                    await SendEmailAndUpdateRelatedField(salesDocEmail);
 
                     tx.Complete();
                 }
@@ -138,7 +138,7 @@ namespace SPRA_SchJob.Services
 
         #region private
 
-        private async Task SendEmail(IQueryable<DocEmailModel> docEmail)
+        private async Task SendEmailAndUpdateRelatedField(IQueryable<DocEmailModel> docEmail)
         {
             Logger.Info("Running Send Email Schedule Job");
             DateTime currTime = DateTime.Now;
@@ -159,35 +159,8 @@ namespace SPRA_SchJob.Services
 
             await __emailClient.SendMessage(emailToSend.ToList());
 
-            // update email record is_sent
-            (from ets in emailToSend
-             from er in __misunitofwork.GetRepository<EmailRecord>().GetEntity().Where(e => e.EmailRecordId == ets.EmailRecordID)
-             select er)
-                    .ToList().ForEach(e =>
-                    {
-                        e.IsSent = "Y";
-                        CommonTools.SetCommonFieldForUpdate(e);
-                        e.SendDatetime = DateTime.Now;
-                    });
-
-            // update apeu log doc
-            (from sde in docEmail
-             from aplog in __misunitofwork.GetRepository<ApeuLogDoc>().GetEntity()
-                                            .Where(e => e.ApeuDocId == sde.ApeuDocID)
-             select aplog)
-                .ToList().ForEach(e =>
-                {
-                    e.IsEmailSent = 'Y';
-                    CommonTools.SetCommonFieldForUpdate(e);
-                });
-
-            __misunitofwork.Commit();
-        }
-        private void CreateEmailRecordAndUpdateRelatedFields(IQueryable<DocEmailModel> salesDocEmail)
-        {
-
             //update register table
-            (from sde in salesDocEmail
+            (from sde in docEmail
              from rpl in __misunitofwork.GetRepository<RegisterPriceList>().GetEntity()
                                   .Where(e => e.IsDeleted == "N" && e.ApeuDocId == sde.ApeuDocID).DefaultIfEmpty()
              from rsa in __misunitofwork.GetRepository<RegisterSalesArrangement>().GetEntity()
@@ -215,6 +188,32 @@ namespace SPRA_SchJob.Services
                  if (e.ra != null) { e.ra.AssignedTo = e.userID; CommonTools.SetCommonFieldForUpdate(e.ra); }
              });
 
+            // update email record is_sent
+            (from ets in emailToSend
+             from er in __misunitofwork.GetRepository<EmailRecord>().GetEntity().Where(e => e.EmailRecordId == ets.EmailRecordID)
+             select er)
+                    .ToList().ForEach(e =>
+                    {
+                        e.IsSent = "Y";
+                        CommonTools.SetCommonFieldForUpdate(e);
+                        e.SendDatetime = DateTime.Now;
+                    });
+
+            // update apeu log doc
+            (from sde in docEmail
+             from aplog in __misunitofwork.GetRepository<ApeuLogDoc>().GetEntity()
+                                            .Where(e => e.ApeuDocId == sde.ApeuDocID)
+             select aplog)
+                .ToList().ForEach(e =>
+                {
+                    e.IsEmailSent = 'Y';
+                    CommonTools.SetCommonFieldForUpdate(e);
+                });
+
+            __misunitofwork.Commit();
+        }
+        private void InsertEmailRecord(IQueryable<DocEmailModel> salesDocEmail)
+        {
 
             //insert email history record
             __misunitofwork.GetRepository<EmailRecord>().Insert(salesDocEmail.AsEnumerable().Select(e =>
