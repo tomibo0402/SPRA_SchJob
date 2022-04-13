@@ -36,7 +36,7 @@ namespace SPRA_SchJob.Services
                                         from ct in __misunitofwork.GetRepository<CodeTable>().GetEntity()
                                                    .Where(e => e.IsDeleted == "N" && e.CodeMasterType == "APEU_DOC" && e.GroupType == "DOC_TYPE" && e.Code == email.DocType)
                                         from user in __misunitofwork.GetRepository<SystemUser>().GetEntity()
-                                                   .Where(e => email.SendToPost == e.Post)
+                                                   .Where(e => email.SendToPost == e.Post && e.Status == "A")
                                         from et in __misunitofwork.GetRepository<EmailTemplate>().GetEntity()
                                                    .Where(e => e.IsDeleted == "N" && e.EmailTemplateId == email.EmailTemplateId)
                                         let messageValue = new List<object> { user.Name, user.Email, email.DocType }
@@ -80,7 +80,7 @@ namespace SPRA_SchJob.Services
                                         from ct in __misunitofwork.GetRepository<CodeTable>().GetEntity()
                                                    .Where(e => e.IsDeleted == "N" && e.CodeMasterType == "APEU_DOC" && e.GroupType == "DOC_TYPE" && e.Code == email.DocType)
                                         from user in __misunitofwork.GetRepository<SystemUser>().GetEntity()
-                                                   .Where(e => email.SendToPost == e.Post)
+                                                   .Where(e => email.SendToPost == e.Post && e.Status == "A")
                                         from et in __misunitofwork.GetRepository<EmailTemplate>().GetEntity()
                                                    .Where(e => e.IsDeleted == "N" && e.EmailTemplateId == email.EmailTemplateId)
                                         let messageValue = new List<object> { user.Name, user.Email, email.DocType }
@@ -99,7 +99,7 @@ namespace SPRA_SchJob.Services
                     InsertEmailRecord(salesDocEmail);
 
                     await SendEmailAndUpdateRelatedField(salesDocEmail);
-
+                    __misunitofwork.Commit();
                     tx.Complete();
                 }
                 catch (Exception e)
@@ -141,7 +141,7 @@ namespace SPRA_SchJob.Services
         private async Task SendEmailAndUpdateRelatedField(IQueryable<DocEmailModel> docEmail)
         {
             Logger.Info("Running Send Email Schedule Job");
-            DateTime currTime = DateTime.Now;
+
             var emailToSend = from email in __misunitofwork.GetRepository<EmailRecord>().GetEntity()
                                                .Where(e => e.IsDeleted == "N" && e.IsSent == "N")
                               from user in __misunitofwork.GetRepository<SystemUser>().GetEntity()
