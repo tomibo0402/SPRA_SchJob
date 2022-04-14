@@ -40,7 +40,9 @@ namespace SPRA_SchJob.Services
                                                     .Where(e => email.SendToPost == e.Post && e.Status == "A")
                                          from et in __misunitofwork.GetRepository<EmailTemplate>().GetEntity()
                                                     .Where(e => e.IsDeleted == "N" && e.EmailTemplateId == email.EmailTemplateId)
-                                         let messageValue = new List<object> { user.Name, user.Email, email.DocType }
+                                         let messageValue = new Dictionary<string, string> {
+                                             { "received_date", aplog.CreateDate.AddDays(2).ToShortDateString() }
+                                         }
                                          select new EmailSendingModel
                                          {
                                              ApeuDocID = aplog.ApeuDocId,
@@ -48,7 +50,7 @@ namespace SPRA_SchJob.Services
                                              DocType = aplog.DocType,
                                              Post = user.Post,
                                              Subject = et.Subject,
-                                             Message = __emailClient.BuildMessage(et.Content, null),
+                                             Message = __emailClient.BuildMessage(et.Content, messageValue),
                                              EmailAddress = user.Email
                                          }).ToList();
                     if (!salesDocEmail.Any())
@@ -57,12 +59,13 @@ namespace SPRA_SchJob.Services
                     InsertEmailRecord(salesDocEmail);
                     List<EmailSendingModel> docEmail = await SendEmail();
                     UpdateEmailRecord(docEmail);
-                    List<SalesDocEmailModel> salesDocEmailModel = docEmail.Select(e => new SalesDocEmailModel
+                    List<SalesDocEmailModel> salesDocEmailModel = salesDocEmail.Select(e => new SalesDocEmailModel
                     {
                         ApeuDocId = e.ApeuDocID
                     }).ToList();
                     UpdateApeuLogDoc(salesDocEmailModel);
 
+                    __misunitofwork.Commit();
                     tx.Complete();
                 }
                 catch (Exception e)
@@ -114,16 +117,20 @@ namespace SPRA_SchJob.Services
                                                     .Where(e => email.SendToPost == e.Post && e.Status == "A")
                                          from et in __misunitofwork.GetRepository<EmailTemplate>().GetEntity()
                                                     .Where(e => e.IsDeleted == "N" && e.EmailTemplateId == email.EmailTemplateId)
+                                         let headerValue = new Dictionary<string, string>{
+                                             { "type", ct.CodeDescriptionEng }
+                                         }
                                          let messageValue = new Dictionary<string, string> {
                                             { "today", DateTime.Today.ToShortDateString() },
-                                            { "dev_list", string.Join(",",emailResponse[a.Key].Select(e => e.DevelopmentNameEng)) }
-                                        }
+                                            //TODO
+                                            { "dev_list", __emailClient.BuildDevList(emailResponse[a.Key].ToList()) }
+                                         }
                                          select new EmailSendingModel
                                          {
                                              UserID = user.UserId,
                                              Post = user.Post,
                                              DocType = a.Key,
-                                             Subject = et.Subject,
+                                             Subject = __emailClient.BuildMessage(et.Subject, headerValue),
                                              Message = __emailClient.BuildMessage(et.Content, messageValue),
                                              EmailAddress = user.Email
                                          }).ToList();

@@ -26,6 +26,12 @@ namespace SPRA_SchJob.EmailMessageBuilder
             return messageTemplate;
         }
 
+        public string BuildDevList(List<SalesDocEmailModel> docEmail)
+        {
+            //TODO
+            return "";
+        }
+
         public async Task SendMessage(List<EmailSendingModel> emailMessage)
         {
             foreach (var emailObject in emailMessage)
