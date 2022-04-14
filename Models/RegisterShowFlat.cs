@@ -39,6 +39,11 @@ namespace SPRA_SchJob.Models
         public string ShowFlatLocation { get; set; }
         public DateTime? CheckingCompletionDate { get; set; }
         public DateTime? AvailableDate { get; set; }
+        public string VendorContact { get; set; }
+        public string FurtherChecking { get; set; }
+        public DateTime? FurtherCheckingDate { get; set; }
         public int? AssignedTo { get; set; }
+        public string Status { get; set; }
+        public string DocRefNo { get; set; }
     }
 }

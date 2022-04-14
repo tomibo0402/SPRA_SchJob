@@ -29,32 +29,40 @@ namespace SPRA_SchJob.Services
             {
                 try
                 {
-                    var salesDocEmail = from aplog in __misunitofwork.GetRepository<ApeuLogDoc>().GetEntity()
-                                                   .Where(e => e.IsDeleted == "N" && e.DocType == "SRPE" && e.IsEmailSent == 'N')
-                                        from email in __misunitofwork.GetRepository<SalesDocEmail>().GetEntity()
-                                                   .Where(e => e.IsDeleted == "N" && e.DocType == aplog.DocType)
-                                        from ct in __misunitofwork.GetRepository<CodeTable>().GetEntity()
-                                                   .Where(e => e.IsDeleted == "N" && e.CodeMasterType == "APEU_DOC" && e.GroupType == "DOC_TYPE" && e.Code == email.DocType)
-                                        from user in __misunitofwork.GetRepository<SystemUser>().GetEntity()
-                                                   .Where(e => email.SendToPost == e.Post && e.Status == "A")
-                                        from et in __misunitofwork.GetRepository<EmailTemplate>().GetEntity()
-                                                   .Where(e => e.IsDeleted == "N" && e.EmailTemplateId == email.EmailTemplateId)
-                                        let messageValue = new List<object> { user.Name, user.Email, email.DocType }
-                                        select new DocEmailModel
-                                        {
-                                            ApeuDocID = aplog.ApeuDocId,
-                                            UserID = user.UserId,
-                                            Post = user.Post,
-                                            Subject = et.Subject,
-                                            Message = __emailClient.BuildMessage(et.Content, messageValue),
-                                            EmailAddress = user.Email
-                                        };
+
+                    var salesDocEmail = (from aplog in __misunitofwork.GetRepository<ApeuLogDoc>().GetEntity()
+                                                    .Where(e => e.IsDeleted == "N" && e.DocType == "SRPE" && e.IsEmailSent == "N")
+                                         from email in __misunitofwork.GetRepository<SalesDocEmail>().GetEntity()
+                                                    .Where(e => e.IsDeleted == "N" && e.DocType == aplog.DocType)
+                                         from ct in __misunitofwork.GetRepository<CodeTable>().GetEntity()
+                                                    .Where(e => e.IsDeleted == "N" && e.CodeMasterType == "APEU_DOC" && e.GroupType == "DOC_TYPE" && e.Code == email.DocType)
+                                         from user in __misunitofwork.GetRepository<SystemUser>().GetEntity()
+                                                    .Where(e => email.SendToPost == e.Post && e.Status == "A")
+                                         from et in __misunitofwork.GetRepository<EmailTemplate>().GetEntity()
+                                                    .Where(e => e.IsDeleted == "N" && e.EmailTemplateId == email.EmailTemplateId)
+                                         let messageValue = new List<object> { user.Name, user.Email, email.DocType }
+                                         select new EmailSendingModel
+                                         {
+                                             ApeuDocID = aplog.ApeuDocId,
+                                             UserID = user.UserId,
+                                             DocType = aplog.DocType,
+                                             Post = user.Post,
+                                             Subject = et.Subject,
+                                             Message = __emailClient.BuildMessage(et.Content, null),
+                                             EmailAddress = user.Email
+                                         }).ToList();
                     if (!salesDocEmail.Any())
                         return;
 
                     InsertEmailRecord(salesDocEmail);
+                    List<EmailSendingModel> docEmail = await SendEmail();
+                    UpdateEmailRecord(docEmail);
+                    List<SalesDocEmailModel> salesDocEmailModel = docEmail.Select(e => new SalesDocEmailModel
+                    {
+                        ApeuDocId = e.ApeuDocID
+                    }).ToList();
+                    UpdateApeuLogDoc(salesDocEmailModel);
 
-                    await SendEmailAndUpdateRelatedField(salesDocEmail);
                     tx.Complete();
                 }
                 catch (Exception e)
@@ -73,32 +81,62 @@ namespace SPRA_SchJob.Services
             {
                 try
                 {
-                    var salesDocEmail = from aplog in __misunitofwork.GetRepository<ApeuLogDoc>().GetEntity()
-                                                   .Where(e => e.IsDeleted == "N" && e.DocType != "SRPE" && e.IsEmailSent == 'N')
-                                        from email in __misunitofwork.GetRepository<SalesDocEmail>().GetEntity()
-                                                   .Where(e => e.IsDeleted == "N" && e.DocType == aplog.DocType)
-                                        from ct in __misunitofwork.GetRepository<CodeTable>().GetEntity()
-                                                   .Where(e => e.IsDeleted == "N" && e.CodeMasterType == "APEU_DOC" && e.GroupType == "DOC_TYPE" && e.Code == email.DocType)
-                                        from user in __misunitofwork.GetRepository<SystemUser>().GetEntity()
-                                                   .Where(e => email.SendToPost == e.Post && e.Status == "A")
-                                        from et in __misunitofwork.GetRepository<EmailTemplate>().GetEntity()
-                                                   .Where(e => e.IsDeleted == "N" && e.EmailTemplateId == email.EmailTemplateId)
-                                        let messageValue = new List<object> { user.Name, user.Email, email.DocType }
-                                        select new DocEmailModel
+                    var apeuLogEmail = (from aplogdoc in __misunitofwork.GetRepository<ApeuLogDoc>().GetEntity()
+                                                   .Where(e => e.IsDeleted == "N" && e.DocType != "SRPE" && e.IsEmailSent == "N")
+                                        from aplog in __misunitofwork.GetRepository<ApeuLog>().GetEntity()
+                                                    .Where(e => e.IsDeleted == "N" && e.ApeuLogId == aplogdoc.ApeuLogId)
+                                        from devmas in __misunitofwork.GetRepository<DevelopmentMaster>().GetEntity()
+                                                    .Where(e => e.IsDeleted == "N" && e.DevelopmentId == aplog.DevelopmentId)
+                                        select new SalesDocEmailModel
                                         {
-                                            ApeuDocID = aplog.ApeuDocId,
-                                            UserID = user.UserId,
-                                            Post = user.Post,
-                                            Subject = et.Subject,
-                                            Message = __emailClient.BuildMessage(et.Content, messageValue),
-                                            EmailAddress = user.Email
-                                        };
-                    if (!salesDocEmail.Any())
+                                            ApeuDocId = aplogdoc.ApeuDocId,
+                                            DocType = aplogdoc.DocType,
+                                            DevelopmentId = aplog.DevelopmentId,
+                                            AssignedUser = aplogdoc.CreateUser,
+                                            DevelopmentNo = aplog.DevelopmentNo,
+                                            DevelopmentNameChi = devmas.DevelopmentNameChi,
+                                            DevelopmentNameEng = devmas.DevelopmentNameEng,
+                                            ReceivedDate = aplog.OpenDatetime
+                                        }).ToList();
+                    if (!apeuLogEmail.Any())
+                    {
                         return;
+                    }
+
+                    var emailResponse = apeuLogEmail.GroupBy(e => e.DocType).ToDictionary(o => o.Key, o => o.ToList());
+
+                    var salesDocEmail = (from a in emailResponse
+                                         from email in __misunitofwork.GetRepository<SalesDocEmail>().GetEntity()
+                                                    .Where(e => e.IsDeleted == "N" && e.DocType == a.Key)
+                                         from ct in __misunitofwork.GetRepository<CodeTable>().GetEntity()
+                                                    .Where(e => e.IsDeleted == "N" && e.CodeMasterType == "APEU_DOC" && e.GroupType == "DOC_TYPE" && e.Code == email.DocType)
+                                         from user in __misunitofwork.GetRepository<SystemUser>().GetEntity()
+                                                    .Where(e => email.SendToPost == e.Post && e.Status == "A")
+                                         from et in __misunitofwork.GetRepository<EmailTemplate>().GetEntity()
+                                                    .Where(e => e.IsDeleted == "N" && e.EmailTemplateId == email.EmailTemplateId)
+                                         let messageValue = new Dictionary<string, string> {
+                                            { "today", DateTime.Today.ToShortDateString() },
+                                            { "dev_list", string.Join(",",emailResponse[a.Key].Select(e => e.DevelopmentNameEng)) }
+                                        }
+                                         select new EmailSendingModel
+                                         {
+                                             UserID = user.UserId,
+                                             Post = user.Post,
+                                             DocType = a.Key,
+                                             Subject = et.Subject,
+                                             Message = __emailClient.BuildMessage(et.Content, messageValue),
+                                             EmailAddress = user.Email
+                                         }).ToList();
 
                     InsertEmailRecord(salesDocEmail);
 
-                    await SendEmailAndUpdateRelatedField(salesDocEmail);
+                    List<EmailSendingModel> emailSent = await SendEmail();
+                    UpdateEmailRecord(emailSent);
+                    UpdateApeuLogDoc(apeuLogEmail);
+                    UpdateRelatedField(apeuLogEmail);
+                    // update email record is_sent
+
+
                     __misunitofwork.Commit();
                     tx.Complete();
                 }
@@ -137,16 +175,13 @@ namespace SPRA_SchJob.Services
         }
 
         #region private
-
-        private async Task SendEmailAndUpdateRelatedField(IQueryable<DocEmailModel> docEmail)
+        private async Task<List<EmailSendingModel>> SendEmail()
         {
-            Logger.Info("Running Send Email Schedule Job");
-
             var emailToSend = from email in __misunitofwork.GetRepository<EmailRecord>().GetEntity()
                                                .Where(e => e.IsDeleted == "N" && e.IsSent == "N")
                               from user in __misunitofwork.GetRepository<SystemUser>().GetEntity()
                                                  .Where(e => e.IsDeleted == "N" && email.ReceivedUser == e.UserId)
-                              select new DocEmailModel
+                              select new EmailSendingModel
                               {
                                   EmailRecordID = email.EmailRecordId,
                                   EmailAddress = user.Email,
@@ -155,25 +190,60 @@ namespace SPRA_SchJob.Services
                                   Message = email.Content
                               };
             if (!emailToSend.Any())
-                return;
+                throw new Exception();
 
             await __emailClient.SendMessage(emailToSend.ToList());
+            return emailToSend.ToList();
+        }
+        private void UpdateEmailRecord(List<EmailSendingModel> docEmail)
+        {
+            (from ets in docEmail
+             from er in __misunitofwork.GetRepository<EmailRecord>().GetEntity().Where(e => e.EmailRecordId == ets.EmailRecordID)
+             select er)
+                .ToList().ForEach(e =>
+                {
+                    e.IsSent = "Y";
+                    CommonTools.SetCommonFieldForUpdate(e);
+                    e.SendDatetime = DateTime.Now;
+                });
+        }
+        private void UpdateApeuLogDoc(List<SalesDocEmailModel> docEmail)
+        {
+            // update apeu log doc
+            (from sde in docEmail
+             from aplog in __misunitofwork.GetRepository<ApeuLogDoc>().GetEntity()
+                                            .Where(e => e.ApeuDocId == sde.ApeuDocId)
+             select aplog)
+                .ToList().ForEach(e =>
+                {
+                    e.IsEmailSent = "Y";
+                    CommonTools.SetCommonFieldForUpdate(e);
+                });
+        }
+
+        private void UpdateRelatedField(List<SalesDocEmailModel> docEmail)
+        {
+            Logger.Info("Running Send Email Schedule Job");
+
+
+            if (!docEmail.Any())
+                return;
 
             //update register table
             (from sde in docEmail
              from rpl in __misunitofwork.GetRepository<RegisterPriceList>().GetEntity()
-                                  .Where(e => e.IsDeleted == "N" && e.ApeuDocId == sde.ApeuDocID).DefaultIfEmpty()
+                                  .Where(e => e.IsDeleted == "N" && e.ApeuDocId == sde.ApeuDocId).DefaultIfEmpty()
              from rsa in __misunitofwork.GetRepository<RegisterSalesArrangement>().GetEntity()
-                                  .Where(e => e.IsDeleted == "N" && e.ApeuDocId == sde.ApeuDocID).DefaultIfEmpty()
+                                  .Where(e => e.IsDeleted == "N" && e.ApeuDocId == sde.ApeuDocId).DefaultIfEmpty()
              from rsb in __misunitofwork.GetRepository<RegisterSalesBrochure>().GetEntity()
-                                  .Where(e => e.IsDeleted == "N" && e.ApeuDocId == sde.ApeuDocID).DefaultIfEmpty()
+                                  .Where(e => e.IsDeleted == "N" && e.ApeuDocId == sde.ApeuDocId).DefaultIfEmpty()
              from rsf in __misunitofwork.GetRepository<RegisterTransactionMaster>().GetEntity()
-                                  .Where(e => e.IsDeleted == "N" && e.ApeuDocId == sde.ApeuDocID).DefaultIfEmpty()
+                                  .Where(e => e.IsDeleted == "N" && e.ApeuDocId == sde.ApeuDocId).DefaultIfEmpty()
              from ra in __misunitofwork.GetRepository<RegisterAdvertisement>().GetEntity()
-                                   .Where(e => e.IsDeleted == "N" && e.ApeuDocId == sde.ApeuDocID).DefaultIfEmpty()
+                                   .Where(e => e.IsDeleted == "N" && e.ApeuDocId == sde.ApeuDocId).DefaultIfEmpty()
              select new
              {
-                 userID = sde.UserID,
+                 userID = sde.AssignedUser,
                  rpl,
                  rsa,
                  rsb,
@@ -188,31 +258,9 @@ namespace SPRA_SchJob.Services
                  if (e.ra != null) { e.ra.AssignedTo = e.userID; CommonTools.SetCommonFieldForUpdate(e.ra); }
              });
 
-            // update email record is_sent
-            (from ets in emailToSend
-             from er in __misunitofwork.GetRepository<EmailRecord>().GetEntity().Where(e => e.EmailRecordId == ets.EmailRecordID)
-             select er)
-                    .ToList().ForEach(e =>
-                    {
-                        e.IsSent = "Y";
-                        CommonTools.SetCommonFieldForUpdate(e);
-                        e.SendDatetime = DateTime.Now;
-                    });
-
-            // update apeu log doc
-            (from sde in docEmail
-             from aplog in __misunitofwork.GetRepository<ApeuLogDoc>().GetEntity()
-                                            .Where(e => e.ApeuDocId == sde.ApeuDocID)
-             select aplog)
-                .ToList().ForEach(e =>
-                {
-                    e.IsEmailSent = 'Y';
-                    CommonTools.SetCommonFieldForUpdate(e);
-                });
-
             __misunitofwork.Commit();
         }
-        private void InsertEmailRecord(IQueryable<DocEmailModel> salesDocEmail)
+        private void InsertEmailRecord(List<EmailSendingModel> salesDocEmail)
         {
 
             //insert email history record
@@ -229,7 +277,7 @@ namespace SPRA_SchJob.Services
                 };
                 CommonTools.SetCommonFieldForCreate(er);
                 return er;
-            }).ToList()); ;
+            }).ToList());
 
 
             __misunitofwork.Commit();

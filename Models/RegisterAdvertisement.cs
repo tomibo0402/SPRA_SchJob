@@ -14,14 +14,14 @@ namespace SPRA_SchJob.Models
         public string AdType { get; set; }
         public string AdName { get; set; }
         public DateTime? PrintDate { get; set; }
-        public string AdvReviseFlag { get; set; }
+        public string AdReviseFlag { get; set; }
         public DateTime? SbAvailableDate { get; set; }
-        public DateTime? CheckDateAipo { get; set; }
-        public int? AipoUserId { get; set; }
-        public DateTime? CheckDateIpo { get; set; }
-        public int? IpoUserId { get; set; }
-        public DateTime? EndorsementDateSipo { get; set; }
-        public int? SipoUserId { get; set; }
+        public DateTime? CheckDateAipo1 { get; set; }
+        public int? Aipo1UserId { get; set; }
+        public DateTime? CheckDateIpo1 { get; set; }
+        public int? Ipo1UserId { get; set; }
+        public DateTime? EndorsementDateSipo1 { get; set; }
+        public int? Sipo1UserId { get; set; }
         public DateTime? ApprovalDateCipo { get; set; }
         public int? CipoUserId { get; set; }
         public string IsCompianceOrdinance { get; set; }
@@ -40,5 +40,12 @@ namespace SPRA_SchJob.Models
         public DateTime? UpdateDate { get; set; }
         public string ActionId { get; set; }
         public int? AssignedTo { get; set; }
+        public string DocRefNo { get; set; }
+        public DateTime? CheckDateAipo2 { get; set; }
+        public int? Aipo2UserId { get; set; }
+        public DateTime? CheckDateIpo2 { get; set; }
+        public int? Ipo2UserId { get; set; }
+        public DateTime? CheckDateSipo2 { get; set; }
+        public int? Sipo2UserId { get; set; }
     }
 }

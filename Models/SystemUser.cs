@@ -12,7 +12,9 @@ namespace SPRA_SchJob.Models
             SystemUserRoles = new HashSet<SystemUserRole>();
         }
 
+
         public int UserId { get; set; }
+        public string Rank { get; set; }
         public string Post { get; set; }
         public string Name { get; set; }
         public string ChineseName { get; set; }

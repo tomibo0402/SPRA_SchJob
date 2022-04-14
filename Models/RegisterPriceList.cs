@@ -52,5 +52,7 @@ namespace SPRA_SchJob.Models
         public string IsVettingRequired { get; set; }
         public string Status { get; set; }
         public int? AssignedTo { get; set; }
+        public DateTime? CheckDateIpo2 { get; set; }
+        public int? Ipo2UserId { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SPRA_SchJob.EmailMessageBuilder
@@ -14,12 +15,18 @@ namespace SPRA_SchJob.EmailMessageBuilder
         {
             __smtpClient = smtpClient;
         }
-        public string BuildMessage(string messageTemplate, List<object> value)
+        public string BuildMessage(string messageTemplate, Dictionary<string, string> map)
         {
-            return string.Format(messageTemplate, value.Select(e => e.ToString()).ToArray());
+            var keys = Regex.Matches(messageTemplate, "({.+?})").ToList().Select(e => e.Value.Substring(1, e.Length - 2));
+
+            foreach (string key in keys)
+            {
+                messageTemplate = messageTemplate.Replace("{" + key + "}", map[key]);
+            }
+            return messageTemplate;
         }
 
-        public async Task SendMessage(List<DocEmailModel> emailMessage)
+        public async Task SendMessage(List<EmailSendingModel> emailMessage)
         {
             foreach (var emailObject in emailMessage)
             {

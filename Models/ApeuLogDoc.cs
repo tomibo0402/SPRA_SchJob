@@ -24,6 +24,6 @@ namespace SPRA_SchJob.Models
         public DateTime? Date2 { get; set; }
         public int? TotalNoOfUnits { get; set; }
         public DateTime? FirstDateSales { get; set; }
-        public char IsEmailSent { get; set; }
+        public string IsEmailSent { get; set; }
     }
 }

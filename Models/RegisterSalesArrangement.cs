@@ -49,7 +49,7 @@ namespace SPRA_SchJob.Models
         public DateTime? EndorsementDateSipo2 { get; set; }
         public int? Sipo2UserId { get; set; }
         public string Status { get; set; }
-        public string SisSuspensionOnly { get; set; }
+        public string IsSuspensionOnly { get; set; }
         public int? AssignedTo { get; set; }
     }
 }
