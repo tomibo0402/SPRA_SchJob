@@ -29,7 +29,6 @@ namespace SPRA_SchJob.Services
             {
                 try
                 {
-
                     var salesDocEmail = (from aplog in __misunitofwork.GetRepository<ApeuLogDoc>().GetEntity()
                                                     .Where(e => e.IsDeleted == "N" && e.DocType == "SRPE" && e.IsEmailSent == "N")
                                          from email in __misunitofwork.GetRepository<SalesDocEmail>().GetEntity()
@@ -78,7 +77,6 @@ namespace SPRA_SchJob.Services
         }
         public async Task NEW_RECEIVED_DOCUMENT_NOTIFICATION()
         {
-
             Logger.Info("Running Create Email Record Schedule Job");
             using (TransactionScope tx = new TransactionScope(TransactionScopeOption.Required))
             {
