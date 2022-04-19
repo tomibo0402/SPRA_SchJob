@@ -1,5 +1,4 @@
 ﻿using SPRA_SchJob.ServiceModel;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
@@ -28,11 +27,19 @@ namespace SPRA_SchJob.EmailMessageBuilder
 
         public string BuildDevList(List<SalesDocEmailModel> docEmail)
         {
-            //TODO
-            return "";
+            // Development List
+            string devResults = "<ol>";
+
+            foreach (SalesDocEmailModel emailData in docEmail)
+            {
+                string devName = (emailData.DevelopmentNameEng != null) ? emailData.DevelopmentNameEng : emailData.DevelopmentNameChi;
+                devResults += ("<li>" + emailData.DevelopmentNo + " - " + devName + "</li>");
+            }
+            devResults += "</ol>";
+            return devResults;
         }
 
-        public async Task SendMessage(List<EmailSendingModel> emailMessage)
+        public Task SendMessage(List<EmailSendingModel> emailMessage)
         {
             foreach (var emailObject in emailMessage)
             {
@@ -43,6 +50,7 @@ namespace SPRA_SchJob.EmailMessageBuilder
                 message.Body = emailObject.Message;
                 __smtpClient.Send(message);
             }
+            return Task.CompletedTask;
         }
     }
 }
