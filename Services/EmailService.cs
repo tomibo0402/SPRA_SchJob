@@ -157,7 +157,7 @@ namespace SPRA_SchJob.Services
         public EmailConfig GetEmailConfig()
         {
             var config = __misunitofwork.GetRepository<SystemParameter>().GetEntity()
-                .Where(e => e.ParameterType == "EMAIL" && e.IsDeleted == "N");
+                .Where(e => e.ParameterType == "EMAIL" && e.IsDeleted == "N").ToList();
             return new EmailConfig
             {
                 SenderAddress = config.Where(e => e.ParameterCode == "SENDER_ADDRESS").Select(e => e.ParameterValue).First(),
@@ -200,7 +200,7 @@ namespace SPRA_SchJob.Services
             if (!emailToSend.Any())
                 throw new Exception("No email to be sent");
 
-            await __emailClient.SendMessage(emailToSend.ToList());
+            __emailClient.SendMessage(emailToSend.ToList());
             return emailToSend.ToList();
         }
         private void UpdateEmailRecord(List<EmailSendingModel> docEmail)

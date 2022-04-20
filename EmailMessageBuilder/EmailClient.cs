@@ -1,4 +1,5 @@
 ﻿using SPRA_SchJob.ServiceModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
@@ -16,7 +17,7 @@ namespace SPRA_SchJob.EmailMessageBuilder
         }
         public string BuildMessage(string messageTemplate, Dictionary<string, string> map)
         {
-            var keys = Regex.Matches(messageTemplate, "({.+?})").ToList().Select(e => e.Value.Substring(1, e.Length - 2));
+            var keys = Regex.Matches(messageTemplate, "({.+?})").Select(e => e.Value.Substring(1, e.Length - 2));
 
             foreach (string key in keys)
             {
@@ -39,7 +40,7 @@ namespace SPRA_SchJob.EmailMessageBuilder
             return devResults;
         }
 
-        public Task SendMessage(List<EmailSendingModel> emailMessage)
+        public void SendMessage(List<EmailSendingModel> emailMessage)
         {
             foreach (var emailObject in emailMessage)
             {
@@ -50,7 +51,6 @@ namespace SPRA_SchJob.EmailMessageBuilder
                 message.Body = emailObject.Message;
                 __smtpClient.Send(message);
             }
-            return Task.CompletedTask;
         }
     }
 }
