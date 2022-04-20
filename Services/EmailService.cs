@@ -122,7 +122,6 @@ namespace SPRA_SchJob.Services
                                          }
                                          let messageValue = new Dictionary<string, string> {
                                             { "today", DateTime.Today.ToShortDateString() },
-                                            //TODO
                                             { "dev_list", __emailClient.BuildDevList(emailResponse[a.Key].ToList()) }
                                          }
                                          select new EmailSendingModel
@@ -184,6 +183,8 @@ namespace SPRA_SchJob.Services
         #region private
         private async Task<List<EmailSendingModel>> SendEmail()
         {
+            Logger.Info("Send email to target users");
+
             var emailToSend = from email in __misunitofwork.GetRepository<EmailRecord>().GetEntity()
                                                .Where(e => e.IsDeleted == "N" && e.IsSent == "N")
                               from user in __misunitofwork.GetRepository<SystemUser>().GetEntity()
@@ -196,8 +197,10 @@ namespace SPRA_SchJob.Services
                                   Subject = email.Subject,
                                   Message = email.Content
                               };
+            Logger.Info("Insert record to EmailRecord table");
+
             if (!emailToSend.Any())
-                throw new Exception();
+                throw new Exception("No email to be sent");
 
             await __emailClient.SendMessage(emailToSend.ToList());
             return emailToSend.ToList();
@@ -216,6 +219,8 @@ namespace SPRA_SchJob.Services
         }
         private void UpdateApeuLogDoc(List<SalesDocEmailModel> docEmail)
         {
+            Logger.Info("Update record to ApeuLogDoc table");
+
             // update apeu log doc
             (from sde in docEmail
              from aplog in __misunitofwork.GetRepository<ApeuLogDoc>().GetEntity()
@@ -230,9 +235,6 @@ namespace SPRA_SchJob.Services
 
         private void UpdateRelatedField(List<SalesDocEmailModel> docEmail)
         {
-            Logger.Info("Running Send Email Schedule Job");
-
-
             if (!docEmail.Any())
                 return;
 
@@ -270,6 +272,7 @@ namespace SPRA_SchJob.Services
         private void InsertEmailRecord(List<EmailSendingModel> salesDocEmail)
         {
 
+            Logger.Info("Insert record to EmailRecord table");
             //insert email history record
             __misunitofwork.GetRepository<EmailRecord>().Insert(salesDocEmail.AsEnumerable().Select(e =>
             {
