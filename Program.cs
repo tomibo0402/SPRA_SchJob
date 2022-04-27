@@ -9,7 +9,9 @@ namespace SPRA_SchJob
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            CreateHostBuilder(args)
+                .Build()
+                .Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -17,6 +19,8 @@ namespace SPRA_SchJob
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.UseKestrel();
+                    webBuilder.UseIISIntegration();
                 }).ConfigureLogging((context, loggingBuilder) =>
                 {
                     loggingBuilder.AddLog4Net();
