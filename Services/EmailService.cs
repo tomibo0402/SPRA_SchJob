@@ -195,7 +195,7 @@ namespace SPRA_SchJob.Services
                                   Subject = email.Subject,
                                   Message = email.Content
                               };
-            Logger.Info("Insert record to EmailRecord table");
+            Logger.Info($"Insert record to {emailToSend.Count()} EmailRecord table");
 
             if (!emailToSend.Any())
                 throw new Exception("No email to be sent");

@@ -35,6 +35,8 @@ namespace SPRA_SchJob.Jobs
                        .UsingJobData("MethodName", serviceName)
                     );
                 }
+
+                Logger.Info($"Finish Init with {cronJobs.Count} jobs");
             }
             catch (Exception e)
             {
