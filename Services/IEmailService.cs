@@ -10,7 +10,7 @@ namespace SPRA_SchJob.Services
     {
         public Task SRPE_ACCOUNT_NOTIFICATION();
         public Task NEW_RECEIVED_DOCUMENT_NOTIFICATION();
-
+        public List<EmailSendingModel> SEND_EMAIL();
         public List<CronJob> GetScheduler();
         public EmailConfig GetEmailConfig();
 

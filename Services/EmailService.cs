@@ -56,7 +56,7 @@ namespace SPRA_SchJob.Services
                         return;
 
                     InsertEmailRecord(salesDocEmail);
-                    List<EmailSendingModel> docEmail = await SendEmail();
+                    List<EmailSendingModel> docEmail = SEND_EMAIL();
                     UpdateEmailRecord(docEmail);
                     List<SalesDocEmailModel> salesDocEmailModel = salesDocEmail.Select(e => new SalesDocEmailModel
                     {
@@ -134,7 +134,7 @@ namespace SPRA_SchJob.Services
 
                     InsertEmailRecord(salesDocEmail);
 
-                    List<EmailSendingModel> emailSent = await SendEmail();
+                    List<EmailSendingModel> emailSent = SEND_EMAIL();
                     UpdateEmailRecord(emailSent);
                     UpdateApeuLogDoc(apeuLogEmail);
                     UpdateRelatedField(apeuLogEmail);
@@ -177,9 +177,7 @@ namespace SPRA_SchJob.Services
                     CronExpression = e.ParameterValue
                 }).ToList();
         }
-
-        #region private
-        private async Task<List<EmailSendingModel>> SendEmail()
+        public List<EmailSendingModel> SEND_EMAIL()
         {
             Logger.Info("Send email to target users");
 
@@ -200,9 +198,13 @@ namespace SPRA_SchJob.Services
             if (!emailToSend.Any())
                 throw new Exception("No email to be sent");
 
-            __emailClient.SendMessage(emailToSend.ToList());
-            return emailToSend.ToList();
+            var emailList = emailToSend.ToList();
+            __emailClient.SendMessage(emailList);
+            UpdateEmailRecord(emailList);
+            return emailList;
         }
+        #region private
+
         private void UpdateEmailRecord(List<EmailSendingModel> docEmail)
         {
             (from ets in docEmail
@@ -286,6 +288,8 @@ namespace SPRA_SchJob.Services
                 CommonTools.SetCommonFieldForCreate(er);
                 return er;
             }).ToList());
+
+            Logger.Info($"Insert record to {salesDocEmail.Count()} EmailRecord table");
 
 
             __misunitofwork.Commit();
