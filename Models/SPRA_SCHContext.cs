@@ -446,8 +446,6 @@ namespace SPRA_SchJob.Models
 
                 entity.Property(e => e.Content)
                     .IsRequired()
-                    .HasMaxLength(1000)
-                    .IsUnicode(false)
                     .HasColumnName("content");
 
                 entity.Property(e => e.CreateDate)

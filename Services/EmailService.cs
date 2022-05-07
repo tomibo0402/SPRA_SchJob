@@ -56,8 +56,6 @@ namespace SPRA_SchJob.Services
                         return;
 
                     InsertEmailRecord(salesDocEmail);
-                    List<EmailSendingModel> docEmail = SEND_EMAIL();
-                    UpdateEmailRecord(docEmail);
                     List<SalesDocEmailModel> salesDocEmailModel = salesDocEmail.Select(e => new SalesDocEmailModel
                     {
                         ApeuDocId = e.ApeuDocID
@@ -71,7 +69,7 @@ namespace SPRA_SchJob.Services
                 {
                     __misunitofwork.Rollback();
                     tx.Dispose();
-                    Logger.Error(e.Message);
+                    Logger.Error(e.InnerException.Message);
                 }
             }
         }
@@ -134,8 +132,6 @@ namespace SPRA_SchJob.Services
 
                     InsertEmailRecord(salesDocEmail);
 
-                    List<EmailSendingModel> emailSent = SEND_EMAIL();
-                    UpdateEmailRecord(emailSent);
                     UpdateApeuLogDoc(apeuLogEmail);
                     UpdateRelatedField(apeuLogEmail);
                     // update email record is_sent
@@ -148,7 +144,7 @@ namespace SPRA_SchJob.Services
                 {
                     __misunitofwork.Rollback();
                     tx.Dispose();
-                    Logger.Error(e.Message);
+                    Logger.Error(e.InnerException.Message);
                 }
             }
         }
@@ -179,28 +175,37 @@ namespace SPRA_SchJob.Services
         }
         public List<EmailSendingModel> SEND_EMAIL()
         {
+            List<EmailSendingModel> emailList = null;
             Logger.Info("Send email to target users");
+            try
+            {
+                var emailToSend = from email in __misunitofwork.GetRepository<EmailRecord>().GetEntity()
+                                                   .Where(e => e.IsDeleted == "N" && e.IsSent == "N")
+                                  from user in __misunitofwork.GetRepository<SystemUser>().GetEntity()
+                                                     .Where(e => e.IsDeleted == "N" && email.ReceivedUser == e.UserId)
+                                  select new EmailSendingModel
+                                  {
+                                      EmailRecordID = email.EmailRecordId,
+                                      EmailAddress = user.Email,
+                                      UserID = user.UserId,
+                                      Subject = email.Subject,
+                                      Message = email.Content
+                                  };
 
-            var emailToSend = from email in __misunitofwork.GetRepository<EmailRecord>().GetEntity()
-                                               .Where(e => e.IsDeleted == "N" && e.IsSent == "N")
-                              from user in __misunitofwork.GetRepository<SystemUser>().GetEntity()
-                                                 .Where(e => e.IsDeleted == "N" && email.ReceivedUser == e.UserId)
-                              select new EmailSendingModel
-                              {
-                                  EmailRecordID = email.EmailRecordId,
-                                  EmailAddress = user.Email,
-                                  UserID = user.UserId,
-                                  Subject = email.Subject,
-                                  Message = email.Content
-                              };
-            Logger.Info($"Insert record to {emailToSend.Count()} EmailRecord table");
+                if (!emailToSend.Any())
+                    Logger.Warn("No email to be sent");
 
-            if (!emailToSend.Any())
-                throw new Exception("No email to be sent");
+                emailList = emailToSend.ToList();
+                __emailClient.SendMessage(emailList);
+                UpdateEmailRecord(emailList);
 
-            var emailList = emailToSend.ToList();
-            __emailClient.SendMessage(emailList);
-            UpdateEmailRecord(emailList);
+                Logger.Info($"Insert record to {emailList.Count} EmailRecord table");
+
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e.StackTrace);
+            }
             return emailList;
         }
         #region private
@@ -216,6 +221,7 @@ namespace SPRA_SchJob.Services
                     CommonTools.SetCommonFieldForUpdate(e);
                     e.SendDatetime = DateTime.Now;
                 });
+            __misunitofwork.Commit();
         }
         private void UpdateApeuLogDoc(List<SalesDocEmailModel> docEmail)
         {
