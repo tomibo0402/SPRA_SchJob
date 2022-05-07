@@ -199,7 +199,7 @@ namespace SPRA_SchJob.Services
                 __emailClient.SendMessage(emailList);
                 UpdateEmailRecord(emailList);
 
-                Logger.Info($"Insert record to {emailList.Count} EmailRecord table");
+                Logger.Info($"Successfully sent {emailList.Count} Email");
 
             }
             catch (Exception e)
