@@ -21,7 +21,6 @@ namespace SPRA_SchJob
                 {
                     webBuilder.UseStartup<Startup>();
                     webBuilder.UseContentRoot(Directory.GetCurrentDirectory());
-                    webBuilder.UseIISIntegration();
                 }).ConfigureLogging((context, loggingBuilder) =>
                 {
                     loggingBuilder.AddLog4Net();

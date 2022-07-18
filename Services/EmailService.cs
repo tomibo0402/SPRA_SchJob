@@ -133,7 +133,7 @@ namespace SPRA_SchJob.Services
                     InsertEmailRecord(salesDocEmail);
 
                     UpdateApeuLogDoc(apeuLogEmail);
-                    UpdateRelatedField(apeuLogEmail);
+                    //UpdateRelatedField(apeuLogEmail);
                     // update email record is_sent
 
 
@@ -176,6 +176,7 @@ namespace SPRA_SchJob.Services
         public List<EmailSendingModel> SEND_EMAIL()
         {
             List<EmailSendingModel> emailList = null;
+
             Logger.Info("Send email to target users");
             try
             {
@@ -204,7 +205,7 @@ namespace SPRA_SchJob.Services
             }
             catch (Exception e)
             {
-                Logger.Error(e.StackTrace);
+                Logger.Error(e.InnerException.Message);
             }
             return emailList;
         }

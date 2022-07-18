@@ -41,14 +41,17 @@ namespace SPRA_SchJob
             {
                 return new SmtpClient()
                 {
+                    //TODO:Temp email values
                     Host = config.SMTPAddress,
                     Port = config.SMTPPort,
                     EnableSsl = true,
                     DeliveryMethod = SmtpDeliveryMethod.Network,
                     UseDefaultCredentials = false,
                     Credentials = new NetworkCredential(
-                            config.SenderAddress,
-                            config.SenderPassword
+                            "mistestingnec@gmail.com",
+                            "nkcdreltkjmjirei"
+                        //config.SenderAddress,
+                        //config.SenderPassword
                         )
                 };
             });
