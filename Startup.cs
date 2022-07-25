@@ -44,16 +44,7 @@ namespace SPRA_SchJob
                     //TODO:Temp email values
                     Host = config.SMTPAddress,
                     Port = config.SMTPPort,
-                    EnableSsl = true,
-                    DeliveryMethod = SmtpDeliveryMethod.Network,
-                    UseDefaultCredentials = false,
-                    Credentials = new NetworkCredential(
-                            "mistestingnec@gmail.com",
-                            "nkcdreltkjmjirei"
-                        //config.SenderAddress,
-                        //config.SenderPassword
-                        )
-                };
+            };
             });
 
             services.AddScoped<EmailClient>();
