@@ -1925,6 +1925,73 @@ namespace SPRA_SchJob.Models
                     .IsUnicode(false)
                     .HasColumnName("user_unit");
             });
+
+            modelBuilder.Entity<EmailRecipientSetting>(entity =>
+            {
+                entity.ToTable("email_recipient_setting");
+
+                entity.Property(e => e.EmailRecipientSettingId).HasColumnName("email_recipient_setting_id");
+
+                entity.Property(e => e.ActionId)
+                    .IsRequired()
+                    .HasMaxLength(18)
+                    .IsUnicode(false)
+                    .HasColumnName("action_id");
+
+                entity.Property(e => e.CreateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("create_date");
+
+                entity.Property(e => e.CreateUser).HasColumnName("create_user");
+
+                entity.Property(e => e.DocDesc)
+                    .HasMaxLength(200)
+                    .IsUnicode(false)
+                    .HasColumnName("doc_desc");
+
+                entity.Property(e => e.DocType)
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("doc_type");
+
+                entity.Property(e => e.EmailCategory)
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("email_category");
+
+                entity.Property(e => e.EmailTemplateId).HasColumnName("email_template_id");
+
+                entity.Property(e => e.IsDeleted)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("is_deleted")
+                    .HasDefaultValueSql("('N')")
+                    .IsFixedLength(true);
+
+                entity.Property(e => e.Remarks)
+                    .HasMaxLength(200)
+                    .IsUnicode(false)
+                    .HasColumnName("remarks");
+
+                entity.Property(e => e.SendToPost)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("send_to_post");
+
+                entity.Property(e => e.SendToRank)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("send_to_rank");
+
+                entity.Property(e => e.UpdateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("update_date");
+
+                entity.Property(e => e.UpdateUser).HasColumnName("update_user");
+            });
+
             modelBuilder.HasSequence("seq_apeu log");
 
             modelBuilder.HasSequence("seq_apeu_system_no");
